@@ -1,0 +1,7 @@
+{
+    "ID_PROJECT_NOT_EXIST": "Id project không tồn tại",
+    "NAME_PROJECT_EXIST": "Tên project đã tồn tại",
+    "ID_EXTERNAL_PROJECT_EXIST": "Id external project đã tồn tại exist",
+    "ID_EXTERNAL_PROJECT_NOT_EXIST": "Id project label studio không tồn tại",
+    "NAME_PROJECT_INVALID_FORMAT": "tên project không hợp lệ theo format <LB-userId>-<ProjectName>"
+}

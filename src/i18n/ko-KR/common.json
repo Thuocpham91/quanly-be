@@ -1,0 +1,18 @@
+{
+  "PHONE_EXISTS": "Số điện thoại đã tồn tại trên hệ thống.",
+  "PHONE_NOT_EXISTS": "Số điện thoại không tồn tại trên hệ thống.",
+  "LOGIN_ERROR": "Số điện thoại hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.",
+  "USER_NOT_EXISTS": "Tài khoản không tồn tại trên hệ thống, vui lòng kiểm tra lại thộng tin.",
+  "CAMERA_NOT_EXISTS": "Camera không tồn tại",
+  "OLD_PASSWORD_INCORRECT": "Mật khẩu cũ không chính xác",
+  "USER_NOT_PERMISSION": "Người dùng không có quyền thực hiện hành động này.",
+  "CHAT_ROOM_NOT_EXISTS": "Phòng chát không tồn tại. Vui lòng kiểm tra lại",
+  "URL_EXISTS": "Tên miền đã tồn tại. Vui lòng kiểm tra lại",
+  "SERVER_IS_BUSY_TITLE": "Website in use",
+  "SERVER_IS_BUSY": "The website is currently processing another task, we will complete the task and notify you.",
+  "SERVER_IS_READY_TITLE": "Ready for new task",
+  "SERVER_IS_READY": "The website is now ready for you to continue with your new task.",
+  "LIST_NOT_NULL": "Danh sách không được bỏ trống.",
+  "NOT_VALID_FILE": "File uploaded trên Minio sai định dạng",
+  "USER_TOKEN_LABEL_INVALID": "User token label studio sai định dạng"
+}

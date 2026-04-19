@@ -1,0 +1,7 @@
+{
+    "ID_PROJECT_NOT_EXIST": "Id project is invalid",
+    "NAME_PROJECT_EXIST": "This name has been used by other project!",
+    "ID_EXTERNAL_PROJECT_EXIST": "Id project label studio is exist",
+    "ID_EXTERNAL_PROJECT_NOT_EXIST": "Id project label studio project not exist",
+    "NAME_PROJECT_INVALID_FORMAT": "Project name must be <LB-userId>-<ProjectName>"
+}

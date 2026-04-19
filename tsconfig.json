@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node"],
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "lib": [
+      "ES2019.Array",
+      "ES2021.String"
+    ],
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@common/*": [
+        "src/common/*"
+      ],
+      "@core/*": [
+        "src/core/*"
+      ],
+      "@configs/*": [
+        "src/configs/*"
+      ],
+      "@modules-common/*": [
+        "src/modules/common/*"
+      ],
+      "@users/*": [
+        "src/modules/users/*"
+      ],
+      "@auth/*": [
+        "src/modules/auth/*"
+      ],
+      "@modules/*": [
+        "src/modules/*"
+      ]
+    }
+  }
+}

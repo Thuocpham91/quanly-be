@@ -1,0 +1,93 @@
+volumes:
+  quanly-be-service-db-data:
+  certs:
+    external: true
+  vhost.d:
+  html:
+
+
+services:
+  quanly-be-service-db:
+    image: postgres:15
+    platform: linux/x86_64
+    container_name: quanly-be-service-db
+    ports:
+      - "5438:5432"
+    environment:
+      TZ: UTC
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      VIRTUAL_PORT: 5432
+      VIRTUAL_PATH: /quanly-be-service-db
+    restart: always
+    volumes:
+      - quanly-be-service-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME}" ]
+      timeout: 20s
+      retries: 10
+    networks:
+      - gasy-network
+
+  quanly-be-service:
+    build:
+      dockerfile: Dockerfile
+    image: quanly-be-service:latest
+    container_name: quanly-be-service
+    depends_on:
+      - quanly-be-service-db
+    ports:
+      - "${PORT}:${PORT}"
+    restart: always
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT}
+      HOST: ${HOST}
+      PORT: ${PORT}
+
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+
+      SECRETKEY: ${SECRETKEY}
+      EXPIRESIN: ${EXPIRESIN}
+
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      CACHE_TTL: ${CACHE_TTL}
+
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      RABBITMQ_SERVICE_NAME: ${RABBITMQ_SERVICE_NAME}
+      RABBITMQ_QUEUE_NAME: ${RABBITMQ_QUEUE_NAME}
+
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_API_URL: ${MINIO_API_URL}
+
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: ${VIRTUAL_PORT:-9003}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+
+      FRONTEND_URL: ${FRONTEND_URL}
+      BACKEND_URL: ${BACKEND_URL}
+
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_SECURE: ${MAIL_SECURE}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_PASS: ${MAIL_PASS}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    networks:
+      - gasy-network
+
+networks:
+  gasy-network:
+    name: gasy-network
+    external: true

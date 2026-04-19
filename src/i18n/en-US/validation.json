@@ -1,0 +1,7 @@
+{
+  "no_body": "Dữ liệu gửi lên không được để trống",
+  "name_required": "Tên không được để trống",
+  "image_url": "Ảnh phải là một URL hợp lệ",
+  "image_format": "Ảnh phải có định dạng .jpg, .jpeg, .png, .webp hoặc .gif",
+  "link_url": "Link phải là một URL hợp lệ"
+}
