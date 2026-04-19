@@ -12,7 +12,7 @@ services:
     platform: linux/x86_64
     container_name: quanly-be-service-db
     ports:
-      - "5438:5432"
+      - "${DB_PORT}:5432"
     environment:
       TZ: UTC
       POSTGRES_USER: ${DB_USERNAME}
@@ -24,7 +24,7 @@ services:
     volumes:
       - quanly-be-service-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -d ${DB_DATABASE} -U ${DB_USERNAME}" ]
       timeout: 20s
       retries: 10
     networks:
@@ -49,23 +49,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
       DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_PORT: 5432
 
       SECRETKEY: ${SECRETKEY}
       EXPIRESIN: ${EXPIRESIN}
 
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      CACHE_TTL: ${CACHE_TTL}
-
-      RABBITMQ_URL: ${RABBITMQ_URL}
-      RABBITMQ_SERVICE_NAME: ${RABBITMQ_SERVICE_NAME}
-      RABBITMQ_QUEUE_NAME: ${RABBITMQ_QUEUE_NAME}
-
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
-      MINIO_API_URL: ${MINIO_API_URL}
 
       VIRTUAL_HOST: ${VIRTUAL_HOST}
       VIRTUAL_PORT: ${VIRTUAL_PORT:-9003}
