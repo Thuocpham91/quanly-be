@@ -62,6 +62,24 @@ export class Order extends BaseAuditEntity {
   @Column({ type: "numeric", precision: 20, scale: 2, default: 0 })
   unitPrice?: number;
 
+  @Column({ type: "numeric", precision: 20, scale: 2, default: 0, nullable: true })
+  priceGaSo?: number;
+
+  @Column({ type: "numeric", precision: 20, scale: 2, default: 0, nullable: true })
+  priceGaTrong?: number;
+
+  @Column({ type: "numeric", precision: 20, scale: 2, default: 0, nullable: true })
+  priceGaMai?: number;
+
+  @Column({ type: "int", default: 0, nullable: true })
+  gaSo?: number;
+
+  @Column({ type: "int", default: 0, nullable: true })
+  gaTrong?: number;
+
+  @Column({ type: "int", default: 0, nullable: true })
+  gaMai?: number;
+
   @Column({ type: "text", nullable: true })
   description?: string;
 }

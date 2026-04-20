@@ -12,7 +12,16 @@ export class ChickenPrice {
   pricePerKg!: number; // Giá kg hôm nay
 
   @Column({ type: "numeric", precision: 20, scale: 0, nullable: true })
-  pricePerHead?: number; // Giá con (tuỳ chọn)
+  pricePerHead?: number;
+
+  @Column({ type: "numeric", precision: 20, scale: 0, nullable: true })
+  priceGaSo?: number;
+
+  @Column({ type: "numeric", precision: 20, scale: 0, nullable: true })
+  priceGaTrong?: number;
+
+  @Column({ type: "numeric", precision: 20, scale: 0, nullable: true })
+  priceGaMai?: number;
 
   @Column({ type: "text", nullable: true })
   note?: string;

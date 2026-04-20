@@ -21,6 +21,27 @@ export class CreateChickenPriceDto {
   @Type(() => Number)
   pricePerHead?: number;
 
+  @ApiPropertyOptional({ example: 151000 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  priceGaSo?: number;
+
+  @ApiPropertyOptional({ example: 152000 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  priceGaTrong?: number;
+
+  @ApiPropertyOptional({ example: 153000 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  priceGaMai?: number;
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -46,6 +67,27 @@ export class UpdateChickenPriceDto {
   @IsOptional()
   @Type(() => Number)
   pricePerHead?: number;
+
+  @ApiPropertyOptional({ example: 151000 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  priceGaSo?: number;
+
+  @ApiPropertyOptional({ example: 152000 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  priceGaTrong?: number;
+
+  @ApiPropertyOptional({ example: 153000 })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  @Type(() => Number)
+  priceGaMai?: number;
 
   @ApiPropertyOptional()
   @IsString()

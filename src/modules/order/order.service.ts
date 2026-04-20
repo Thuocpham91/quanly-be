@@ -101,6 +101,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
       ...dto,
       createdById: actualCreatorId,
     });
+    this.logger.log(`Order created with payload: ${JSON.stringify(order)}`);
 
     if (dto.workId) {
       const linkedWork = await this.workRepo.findOne({ where: { id: dto.workId + "" } });

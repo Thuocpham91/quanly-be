@@ -77,5 +77,29 @@ export class OrderResponseDto {
 
   @Expose()
   @ApiProperty()
+  gaSo?: number;
+
+  @Expose()
+  @ApiProperty()
+  gaTrong?: number;
+
+  @Expose()
+  @ApiProperty()
+  gaMai?: number;
+
+  @Expose()
+  @ApiProperty()
+  priceGaSo?: number;
+
+  @Expose()
+  @ApiProperty()
+  priceGaTrong?: number;
+
+  @Expose()
+  @ApiProperty()
+  priceGaMai?: number;
+
+  @Expose()
+  @ApiProperty()
   description?: string;
 }

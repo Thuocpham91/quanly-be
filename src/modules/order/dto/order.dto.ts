@@ -54,6 +54,36 @@ export class CreateOrderDto {
   unitPrice?: number;
 
   @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  priceGaSo?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  priceGaTrong?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  priceGaMai?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  gaSo?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  gaTrong?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  gaMai?: number;
+
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   description?: string;
@@ -103,6 +133,36 @@ export class UpdateOrderDto {
   @IsNumber()
   @IsOptional()
   unitPrice?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  priceGaSo?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  priceGaTrong?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  priceGaMai?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  gaSo?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  gaTrong?: number;
+
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  gaMai?: number;
 
   @ApiProperty({ required: false })
   @IsString()
