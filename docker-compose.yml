@@ -20,6 +20,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       VIRTUAL_PORT: 5432
       VIRTUAL_PATH: /quanly-be-service-db
+      CORS_ORIGINS: ${CORS_ORIGINS}
     restart: always
     volumes:
       - quanly-be-service-db-data:/var/lib/postgresql/data
