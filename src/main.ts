@@ -24,8 +24,12 @@ async function bootstrap() {
   app.enableShutdownHooks();
   app.use(morgan("dev"));
 
+  const configService = app.get(ConfigService);
+  const corsOrigins = configService.get<string>("CORS_ORIGINS");
+  const originList = corsOrigins ? corsOrigins.split(",").map((o) => o.trim()) : "*";
+
   app.enableCors({
-    origin: "*",
+    origin: originList,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["authorization", "content-type", "x-custom-lang"],
     credentials: true,
