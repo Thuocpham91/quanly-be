@@ -40,5 +40,6 @@ export interface ObjectTaskResponse {
 export interface ObjectTaskListResponse {
   statusCode: number;
   data: ObjectTaskResponseDto[];
+  total?: number;
   message: string;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ObjectService } from "./object.service";
 import { CreateObjectDto, UpdateObjectDto } from "./dto/object.dto";
@@ -17,8 +17,11 @@ export class ObjectController {
   @Get()
   @ApiOperation({ summary: "Get all objects" })
   @ApiResponse({ status: 200, description: "List of objects" })
-  async getAll(): Promise<ObjectListResponse> {
-    return await this.objectService.getAll();
+  async getAll(
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+  ): Promise<ObjectListResponse> {
+    return await this.objectService.getAll(page, limit);
   }
 
   @Get(":id")
@@ -54,8 +57,12 @@ export class ObjectController {
 
   @Get(":id/tasks")
   @ApiOperation({ summary: "Get object tasks" })
-  async getTasks(@Param("id") id: number): Promise<ObjectTaskListResponse> {
-    return await this.objectService.getTasks(id);
+  async getTasks(
+    @Param("id") id: number,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+  ): Promise<ObjectTaskListResponse> {
+    return await this.objectService.getTasks(id, page, limit);
   }
 
   @Post(":id/tasks")

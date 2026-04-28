@@ -37,5 +37,6 @@ export interface ObjectResponse {
 export interface ObjectListResponse {
   statusCode: number;
   data: ObjectResponseDto[];
+  total?: number;
   message: string;
 }

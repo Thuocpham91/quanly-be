@@ -24,11 +24,20 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     super(objectRepo, ObjectResponseDto);
   }
 
-  async getAll(): Promise<ObjectListResponse> {
-    const objects = await this.objectRepo.find();
+  async getAll(page: number = 1, limit: number = 10): Promise<ObjectListResponse> {
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    const [objects, total] = await this.objectRepo.findAndCount({
+      skip,
+      take,
+      order: { id: "DESC" }
+    });
+
     return {
       statusCode: HttpStatus.OK,
       data: objects.map((item) => this.toDto(item)),
+      total,
       message: SuccessCode.SUCCESS,
     };
   }
@@ -85,13 +94,18 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     };
   }
 
-  async getTasks(objectId: number): Promise<ObjectTaskListResponse> {
+  async getTasks(objectId: number, page: number = 1, limit: number = 10): Promise<ObjectTaskListResponse> {
     const object = await this.objectRepo.findOne({ where: { id: objectId + "" } });
     if (!object) throw new NotFoundException(`Object with ID ${objectId} not found`);
 
-    const tasks = await this.taskRepo.find({
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    const [tasks, total] = await this.taskRepo.findAndCount({
       where: { objectId: object.id },
       order: { workDate: "DESC" },
+      skip,
+      take,
     });
 
     const scheduledTasks = tasks.map((task) => {
@@ -110,6 +124,7 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     return {
       statusCode: HttpStatus.OK,
       data: plainToInstance(ObjectTaskResponseDto, scheduledTasks, { excludeExtraneousValues: true }),
+      total,
       message: SuccessCode.SUCCESS,
     };
   }
