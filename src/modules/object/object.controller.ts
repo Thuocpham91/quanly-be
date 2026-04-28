@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, 
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ObjectService } from "./object.service";
 import { CreateObjectDto, UpdateObjectDto } from "./dto/object.dto";
-import { CreateObjectTaskDto } from "./dto/object-task.dto";
+import { CreateObjectTaskDto, UpdateObjectTaskDto } from "./dto/object-task.dto";
 import { ObjectListResponse, ObjectResponse } from "./dto/response/object.response";
 import { ObjectTaskListResponse, ObjectTaskResponse } from "./dto/response/object-task.response";
 import { AuthCustom } from "@core/decorators/auth-custom.decorator";
@@ -79,7 +79,7 @@ export class ObjectController {
   async updateTask(
     @Param("id") id: number,
     @Param("taskId") taskId: string,
-    @Body() dto: any,
+    @Body() dto: UpdateObjectTaskDto,
   ): Promise<ObjectTaskResponse> {
     return await this.objectService.updateTask(id, taskId, dto);
   }

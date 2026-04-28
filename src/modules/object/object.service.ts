@@ -8,7 +8,7 @@ import { ObjectResponseDto, ObjectListResponse, ObjectResponse } from "./dto/res
 import { ObjectTaskResponseDto, ObjectTaskListResponse, ObjectTaskResponse } from "./dto/response/object-task.response";
 import { BaseService } from "@common/services/base.service";
 import { CreateObjectDto, UpdateObjectDto } from "./dto/object.dto";
-import { CreateObjectTaskDto } from "./dto/object-task.dto";
+import { CreateObjectTaskDto, UpdateObjectTaskDto } from "./dto/object-task.dto";
 import { SuccessCode } from "@common/constans/message-code.enum";
 
 @Injectable()
@@ -148,7 +148,7 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     };
   }
 
-  async updateTask(objectId: number, taskId: string, dto: any): Promise<ObjectTaskResponse> {
+  async updateTask(objectId: number, taskId: string, dto: UpdateObjectTaskDto): Promise<ObjectTaskResponse> {
     const task = await this.taskRepo.findOne({ where: { id: taskId, objectId: objectId + "" } });
     if (!task) throw new NotFoundException(`Task with ID ${taskId} not found for this object`);
 

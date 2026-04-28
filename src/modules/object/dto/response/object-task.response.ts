@@ -29,6 +29,10 @@ export class ObjectTaskResponseDto {
   @ApiPropertyOptional()
   @Expose()
   description?: string;
+
+  @ApiPropertyOptional()
+  @Expose()
+  feedPerAnimal?: number;
 }
 
 export interface ObjectTaskResponse {
