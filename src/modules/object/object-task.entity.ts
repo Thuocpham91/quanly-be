@@ -28,4 +28,7 @@ export class ObjectTask extends BaseAuditEntity {
 
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string;
+
+  @Column({ type: "float", nullable: true })
+  feedPerAnimal?: number;
 }

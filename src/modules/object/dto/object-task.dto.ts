@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsNumber } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreateObjectTaskDto {
@@ -30,6 +30,12 @@ export class CreateObjectTaskDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional({ description: "Grams of feed per animal" })
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  feedPerAnimal?: number;
 }
 
 export class UpdateObjectTaskDto {
@@ -60,4 +66,10 @@ export class UpdateObjectTaskDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional({ description: "Grams of feed per animal" })
+  @Type(() => Number)
+  @IsNumber()
+  @IsOptional()
+  feedPerAnimal?: number;
 }
