@@ -34,4 +34,13 @@ export class WorkTaskResponseDto {
   @Expose()
   @ApiPropertyOptional()
   removalCount?: number;
+
+  @Expose()
+  @ApiProperty()
+  workId!: string;
+
+  @Expose()
+  @ApiPropertyOptional({ type: () => WorkResponseDto })
+  @Type(() => WorkResponseDto)
+  work?: WorkResponseDto;
 }
