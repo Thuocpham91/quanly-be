@@ -20,7 +20,7 @@ export class WorkTask extends BaseAuditEntity {
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string;
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: "timestamptz", nullable: true })
   startDate?: Date;
 
   @Column({ type: "boolean", default: false })
