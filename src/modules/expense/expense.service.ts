@@ -44,6 +44,10 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
       qb.andWhere("entity.category = :category", { category });
     }
 
+    if (query.type) {
+      qb.andWhere("entity.type = :type", { type: query.type });
+    }
+
     if (workId) {
       qb.andWhere("entity.workId = :workId", { workId });
     }

@@ -25,6 +25,11 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   category!: string;
 
+  @ApiProperty({ enum: ['INCOME', 'EXPENSE'], default: 'EXPENSE' })
+  @IsString()
+  @IsOptional()
+  type?: "INCOME" | "EXPENSE";
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -58,6 +63,11 @@ export class UpdateExpenseDto {
   @IsOptional()
   category?: string;
 
+  @ApiPropertyOptional({ enum: ['INCOME', 'EXPENSE'] })
+  @IsString()
+  @IsOptional()
+  type?: "INCOME" | "EXPENSE";
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -74,6 +84,11 @@ export class SearchExpenseDto extends BaseSearchDto {
   @IsString()
   @IsOptional()
   category?: string;
+
+  @ApiPropertyOptional({ enum: ['INCOME', 'EXPENSE'] })
+  @IsString()
+  @IsOptional()
+  type?: "INCOME" | "EXPENSE";
 
   @ApiPropertyOptional()
   @IsString()

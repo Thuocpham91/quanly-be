@@ -10,6 +10,9 @@ export class Expense extends BaseAuditEntity {
   @Column({ type: "varchar", length: 255 })
   title!: string;
 
+  @Column({ type: "varchar", length: 20, default: "EXPENSE" })
+  type!: "INCOME" | "EXPENSE";
+
   @Column({ type: "decimal", precision: 15, scale: 2, transformer: {
     to: (value: number) => value,
     from: (value: string) => parseFloat(value)

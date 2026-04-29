@@ -8,9 +8,10 @@ import { Work } from "../work/work.entity";
 import { CustomerModule } from "../customer/customer.module";
 import { Customer } from "@modules/customer/customer.entity";
 import { MonthlyPayoutModule } from "../monthly-payout/monthly-payout.module";
+import { ExpenseModule } from "../expense/expense.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, User, Work, Customer]), CustomerModule, MonthlyPayoutModule],
+  imports: [TypeOrmModule.forFeature([Order, User, Work, Customer]), CustomerModule, MonthlyPayoutModule, ExpenseModule],
   controllers: [OrderController],
   providers: [OrderService],
   exports: [OrderService],

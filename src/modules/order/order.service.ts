@@ -13,6 +13,7 @@ import { CustomerService } from "../customer/customer.service";
 import { User } from "../user/user.entity";
 import { Customer } from "@modules/customer/customer.entity";
 import { MonthlyPayoutService } from "../monthly-payout/monthly-payout.service";
+import { ExpenseService } from "../expense/expense.service";
 
 @Injectable()
 export class OrderService extends BaseService<Order, OrderResponseDto> {
@@ -32,6 +33,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
 
     private readonly customerService: CustomerService,
     private readonly monthlyPayoutService: MonthlyPayoutService,
+    private readonly expenseService: ExpenseService,
   ) {
     super(orderRepo, OrderResponseDto);
   }
@@ -148,6 +150,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
 
     const oldWorkId = order.workId;
     const oldUserId = order.userId;
+    const oldStatus = order.status;
     Object.assign(order, dto);
 
     if (dto.workId && dto.workId !== oldWorkId) {
@@ -158,6 +161,24 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     }
 
     const updated = await this.orderRepo.save(order);
+
+    // If status changed to DA_HOAN_THANH, record as INCOME in Expense Management
+    if (updated.status === OrderProposalStatusEnum.DA_HOAN_THANH && oldStatus !== OrderProposalStatusEnum.DA_HOAN_THANH) {
+      try {
+        await this.expenseService.create({
+          title: `Thu nhập từ đơn hàng #${updated.id}`,
+          amount: Number(updated.amount || 0),
+          date: updated.orderDate || new Date(),
+          category: 'Doanh thu đơn hàng',
+          type: 'INCOME',
+          workId: updated.workId,
+          description: `Tự động ghi nhận khi đơn hàng #${updated.id} hoàn thành.`
+        });
+        this.logger.log(`Automatically recorded INCOME for completed order #${updated.id}`);
+      } catch (err) {
+        this.logger.error(`Failed to auto-record income for order #${updated.id}:`, err);
+      }
+    }
 
     // Sync work info for both old and new work batches
     if (oldWorkId) await this.syncWorkInfo(oldWorkId);
