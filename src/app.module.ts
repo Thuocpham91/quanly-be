@@ -16,6 +16,7 @@ import { MilestoneModule } from "./modules/milestone/milestone.module";
 import { MonthlyPayoutModule } from "./modules/monthly-payout/monthly-payout.module";
 import { ChickenPriceModule } from "./modules/chicken-price/chicken-price.module";
 import { FileModule } from "@modules/file/file.module";
+import { ExpenseModule } from "./modules/expense/expense.module";
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { FileModule } from "@modules/file/file.module";
     MonthlyPayoutModule,
     ChickenPriceModule,
     FileModule,
+    ExpenseModule,
   ],
 })
 export class AppModule {}
