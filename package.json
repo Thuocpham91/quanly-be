@@ -28,6 +28,7 @@
     "lint-fix": "eslint --fix src/"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.31.0",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.0.1",
     "@fastify/helmet": "^13.0.1",

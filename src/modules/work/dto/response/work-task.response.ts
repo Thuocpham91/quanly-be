@@ -43,4 +43,8 @@ export class WorkTaskResponseDto {
   @ApiPropertyOptional({ type: () => WorkResponseDto })
   @Type(() => WorkResponseDto)
   work?: WorkResponseDto;
+
+  @Expose()
+  @ApiPropertyOptional({ type: [String] })
+  fileUrls?: string[];
 }

@@ -34,4 +34,7 @@ export class WorkTask extends BaseAuditEntity {
 
   @Column({ type: "int", nullable: true })
   removalCount?: number;
+
+  @Column({ type: "simple-array", nullable: true })
+  fileUrls?: string[];
 }

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsBoolean, IsDate, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsInt, IsNotEmpty, IsOptional, IsString, IsArray } from "class-validator";
 import { Type } from "class-transformer";
 import { BaseSearchDto } from "@common/dtos/base-search.dto";
 
@@ -147,6 +147,12 @@ export class UpdateWorkTaskDto {
   @IsInt()
   @IsOptional()
   removalCount?: number;
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  fileUrls?: string[];
 }
 export class SearchWorkTaskDto extends BaseSearchDto {
   @ApiPropertyOptional()
