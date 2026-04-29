@@ -61,10 +61,8 @@ export class AzureBlobStorageService implements OnModuleInit {
         this.logger.log(`Container "${this.container}" created`);
       }
     } catch (error: any) {
-      this.logger.error("Ensure container failed", error);
-      throw new InternalServerErrorException(
-        "Cannot initialize Azure Blob container",
-      );
+      this.logger.error("Ensure container failed: " + error.message);
+      this.logger.warn("Azure Blob Storage is not correctly configured. File uploads to Azure will fail.");
     }
   }
 
