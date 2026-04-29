@@ -10,6 +10,7 @@ import { CreateWorkDto, UpdateWorkDto, SearchWorkDto, UpdateWorkTaskDto, SearchW
 import { SuccessCode } from "@common/constans/message-code.enum";
 import { ObjectResponseDto } from "../object/dto/response/object.response";
 import { WorkTask } from "./work-task.entity";
+import { WorkTaskHistory } from "./work-task-history.entity";
 import { WorkTaskResponseDto } from "./dto/response/work-task.response";
 import { OrderResponseDto } from "../order/dto/order-response.dto";
 import { plainToInstance, ClassConstructor } from "class-transformer";
@@ -28,6 +29,8 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     private readonly objectTaskRepo: Repository<ObjectTask>,
     @InjectRepository(WorkTask)
     private readonly workTaskRepo: Repository<WorkTask>,
+    @InjectRepository(WorkTaskHistory)
+    private readonly workTaskHistoryRepo: Repository<WorkTaskHistory>,
   ) {
     super(workRepo, WorkResponseDto);
   }
@@ -233,16 +236,76 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
   async updateWorkTask(
     id: number,
     dto: UpdateWorkTaskDto,
+    updatedBy?: string
   ): Promise<{ statusCode: number; data: WorkTaskResponseDto | null; message: string }> {
     const task = await this.workTaskRepo.findOne({ where: { id: id + "" } });
     if (!task) throw new NotFoundException(`WorkTask with ID ${id} not found`);
 
+    const histories: WorkTaskHistory[] = [];
+
+    if (dto.quantity !== undefined && dto.quantity !== task.quantity) {
+      histories.push(this.workTaskHistoryRepo.create({
+        workTaskId: task.id,
+        action: 'Cập nhật Số lượng',
+        oldValue: task.quantity?.toString() || '0',
+        newValue: dto.quantity?.toString() || '0',
+        createdBy: updatedBy || 'Hệ thống',
+      }));
+    }
+
+    if (dto.removalCount !== undefined && dto.removalCount !== task.removalCount) {
+      histories.push(this.workTaskHistoryRepo.create({
+        workTaskId: task.id,
+        action: 'Cập nhật Loại bỏ',
+        oldValue: task.removalCount?.toString() || '0',
+        newValue: dto.removalCount?.toString() || '0',
+        createdBy: updatedBy || 'Hệ thống',
+      }));
+    }
+
+    if (dto.employeeChecked !== undefined && dto.employeeChecked !== task.employeeChecked) {
+      histories.push(this.workTaskHistoryRepo.create({
+        workTaskId: task.id,
+        action: 'Xác nhận (Nhân viên)',
+        oldValue: task.employeeChecked ? 'Đã xác nhận' : 'Chưa xác nhận',
+        newValue: dto.employeeChecked ? 'Đã xác nhận' : 'Chưa xác nhận',
+        createdBy: updatedBy || 'Hệ thống',
+      }));
+    }
+
+    if (dto.managerChecked !== undefined && dto.managerChecked !== task.managerChecked) {
+      histories.push(this.workTaskHistoryRepo.create({
+        workTaskId: task.id,
+        action: 'Xác nhận (Quản lý)',
+        oldValue: task.managerChecked ? 'Đã xác nhận' : 'Chưa xác nhận',
+        newValue: dto.managerChecked ? 'Đã xác nhận' : 'Chưa xác nhận',
+        createdBy: updatedBy || 'Hệ thống',
+      }));
+    }
+
     Object.assign(task, dto);
     const updatedTask = await this.workTaskRepo.save(task);
+
+    if (histories.length > 0) {
+      await this.workTaskHistoryRepo.save(histories);
+    }
 
     return {
       statusCode: HttpStatus.OK,
       data: plainToInstance(WorkTaskResponseDto, updatedTask, { excludeExtraneousValues: true }),
+      message: SuccessCode.SUCCESS,
+    };
+  }
+
+  async getTaskHistory(taskId: number) {
+    const histories = await this.workTaskHistoryRepo.find({
+      where: { workTaskId: taskId + "" },
+      order: { createdAt: "DESC" },
+    });
+
+    return {
+      statusCode: HttpStatus.OK,
+      data: histories,
       message: SuccessCode.SUCCESS,
     };
   }

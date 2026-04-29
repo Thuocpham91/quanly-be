@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { WorkService } from "./work.service";
 import { CreateWorkDto, UpdateWorkDto, SearchWorkDto, UpdateWorkTaskDto, SearchWorkTaskDto } from "./dto/work.dto";
@@ -44,8 +44,15 @@ export class WorkController {
   @Put("tasks/:id")
   @ApiOperation({ summary: "Update a specific work task" })
   @ApiResponse({ status: 200, description: "Work task updated successfully" })
-  async updateTask(@Param("id") id: number, @Body() dto: UpdateWorkTaskDto) {
-    return await this.workService.updateWorkTask(id, dto);
+  async updateTask(@Param("id") id: number, @Body() dto: UpdateWorkTaskDto, @Req() req: any) {
+    const updatedBy = req.user?.fullName || req.user?.username || undefined;
+    return await this.workService.updateWorkTask(id, dto, updatedBy);
+  }
+
+  @Get("tasks/:id/history")
+  @ApiOperation({ summary: "Get update history for a specific work task" })
+  async getTaskHistory(@Param("id") id: number) {
+    return await this.workService.getTaskHistory(id);
   }
 
   @Delete("tasks/:id")

@@ -7,11 +7,12 @@ import { ObjectEntity } from "../object/object.entity";
 import { ObjectTask } from "../object/object-task.entity";
 
 import { WorkTask } from "./work-task.entity";
+import { WorkTaskHistory } from "./work-task-history.entity";
 
 import { Order } from "../order/order.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Work, WorkTask, ObjectEntity, ObjectTask, Order])],
+  imports: [TypeOrmModule.forFeature([Work, WorkTask, WorkTaskHistory, ObjectEntity, ObjectTask, Order])],
   controllers: [WorkController],
   providers: [WorkService],
   exports: [WorkService],
