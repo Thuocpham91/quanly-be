@@ -388,7 +388,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
       params.limit,
       "startDate",
       "ASC",
-      ["work", "work.object"]
+      ["work", "work.object", "work.workTasks"]
     );
 
     return {
