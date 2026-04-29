@@ -6,7 +6,7 @@ import { ObjectEntity } from "../object/object.entity";
 import { ObjectTask } from "../object/object-task.entity";
 import { WorkResponseDto, WorkListResponse, WorkResponse } from "./dto/response/work.response";
 import { BaseService } from "@common/services/base.service";
-import { CreateWorkDto, UpdateWorkDto, SearchWorkDto, UpdateWorkTaskDto, SearchWorkTaskDto } from "./dto/work.dto";
+import { CreateWorkDto, UpdateWorkDto, SearchWorkDto, UpdateWorkTaskDto, SearchWorkTaskDto, CreateWorkTaskDto } from "./dto/work.dto";
 import { SuccessCode } from "@common/constans/message-code.enum";
 import { ObjectResponseDto } from "../object/dto/response/object.response";
 import { WorkTask } from "./work-task.entity";
@@ -201,6 +201,30 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     return {
       statusCode: HttpStatus.CREATED,
       data: this.toDto(result, { object: ObjectResponseDto, workTasks: WorkTaskResponseDto }),
+      message: SuccessCode.SUCCESS,
+    };
+  }
+
+  async createWorkTask(
+    dto: CreateWorkTaskDto,
+  ): Promise<{ statusCode: number; data: WorkTaskResponseDto | null; message: string }> {
+    const work = await this.workRepo.findOne({ where: { id: dto.workId + "" } });
+    if (!work) throw new NotFoundException(`Work with ID ${dto.workId} not found`);
+
+    const task = this.workTaskRepo.create({
+      workId: dto.workId + "",
+      taskName: dto.taskName,
+      description: dto.description,
+      startDate: dto.startDate,
+      employeeChecked: false,
+      managerChecked: false,
+    });
+
+    const savedTask = await this.workTaskRepo.save(task);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      data: plainToInstance(WorkTaskResponseDto, savedTask, { excludeExtraneousValues: true }),
       message: SuccessCode.SUCCESS,
     };
   }

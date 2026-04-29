@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { WorkService } from "./work.service";
-import { CreateWorkDto, UpdateWorkDto, SearchWorkDto, UpdateWorkTaskDto, SearchWorkTaskDto } from "./dto/work.dto";
+import { CreateWorkDto, UpdateWorkDto, SearchWorkDto, UpdateWorkTaskDto, SearchWorkTaskDto, CreateWorkTaskDto } from "./dto/work.dto";
 import { WorkListResponse, WorkResponse } from "./dto/response/work.response";
 
 @ApiTags("Work Management")
@@ -39,6 +39,14 @@ export class WorkController {
   @ApiOperation({ summary: "Get a specific work task by ID" })
   async getTaskById(@Param("id") id: number) {
     return await this.workService.getWorkTaskById(id);
+  }
+
+  @Post("tasks")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Create a new ad-hoc work task" })
+  @ApiResponse({ status: 201, description: "Work task created successfully" })
+  async createWorkTask(@Body() dto: CreateWorkTaskDto) {
+    return await this.workService.createWorkTask(dto);
   }
 
   @Put("tasks/:id")

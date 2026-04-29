@@ -107,6 +107,31 @@ export class UpdateWorkDto {
   @IsOptional()
   removalCount?: number;
 }
+
+export class CreateWorkTaskDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  taskName!: string;
+
+  @ApiProperty()
+  @Type(() => Number)
+  @IsInt()
+  @IsNotEmpty()
+  workId!: number;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty()
+  @Type(() => Date)
+  @IsDate()
+  @IsNotEmpty()
+  startDate!: Date;
+}
+
 export class UpdateWorkTaskDto {
   @ApiPropertyOptional()
   @IsString()
