@@ -24,6 +24,10 @@ export class ExpenseResponseDto {
   category!: string;
 
   @Expose()
+  @ApiProperty({ enum: ['INCOME', 'EXPENSE'] })
+  type!: "INCOME" | "EXPENSE";
+
+  @Expose()
   @ApiPropertyOptional()
   workId?: string;
 
