@@ -51,6 +51,10 @@ export class OrderResponseDto {
 
   @Expose()
   @ApiProperty()
+  userId?: string;
+
+  @Expose()
+  @ApiProperty()
   @Type(() => UserResponseDto)
   user?: UserResponseDto;
 
