@@ -49,4 +49,10 @@ export class CustomerController {
   async delete(@Param("id") id: string, @CurrentUser() user: User): Promise<CustomerResponse> {
     return await this.customerService.deleteCustomer(id, user.id);
   }
+
+  @Get("user/:userCustomId")
+  @ApiOperation({ summary: "Get customer details by linked User ID" })
+  async getByUserId(@Param("userCustomId") userCustomId: string, @CurrentUser() user: User): Promise<CustomerResponse> {
+    return await this.customerService.findByUserCustomId(userCustomId, user.id);
+  }
 }

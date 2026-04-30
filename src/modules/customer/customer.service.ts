@@ -160,4 +160,21 @@ export class CustomerService {
       data: undefined,
     };
   }
+
+  async findByUserCustomId(userCustomId: string, userId: string): Promise<CustomerResponse> {
+    const customer = await this.customerRepo.findOne({ 
+      where: [
+        { userCustomId: userCustomId, userId: userId },
+        { userCustomId: userCustomId } // Fallback to global if needed
+      ]
+    });
+    
+    if (!customer) throw new NotFoundException(`No customer found for User ID ${userCustomId}`);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: SuccessCode.SUCCESS,
+      data: this.toDto(customer),
+    };
+  }
 }
