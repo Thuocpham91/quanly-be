@@ -112,13 +112,14 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     const rawDate = dto.startDate;
 
     if (rawDate) {
-      if (rawDate instanceof Date && !isNaN(rawDate.getTime())) {
-        baseDate = rawDate;
+      const d = new Date(rawDate);
+      if (!isNaN(d.getTime())) {
+        baseDate = d;
       } else {
         const dateStr = String(rawDate);
         if (dateStr.includes("/")) {
-          const [d, m, y] = dateStr.split("/");
-          baseDate = new Date(`${y}-${m}-${d}`);
+          const [day, m, y] = dateStr.split("/").map(Number);
+          baseDate = new Date(y, m - 1, day);
         } else {
           baseDate = new Date(dateStr);
         }
@@ -126,6 +127,9 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     } else {
       baseDate = object.startDate ? new Date(object.startDate) : new Date();
     }
+
+    // Normalize to start of day local time
+    baseDate.setHours(0, 0, 0, 0);
 
     if (isNaN(baseDate.getTime())) {
       throw new BadRequestException("Invalid startDate format. Please use YYYY-MM-DD or DD/MM/YYYY");
@@ -183,6 +187,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
         taskName: task.taskName,
         description: task.description,
         startDate: taskDate,
+        offsetDays: Number(task.workDate),
         quantity: dto.quantity || task.quantity,
         removalCount: task.removalCount,
       });
@@ -351,6 +356,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     const work = await this.workRepo.findOne({ where: { id: id + "" } });
     if (!work) throw new NotFoundException(`Work with ID ${id} not found`);
 
+    const oldStartDate = work.startDate;
     Object.assign(work, dto);
 
     // Recalculate exportDate if workDate is updated
@@ -360,6 +366,22 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
         d.setDate(d.getDate() + 21);
         work.exportDate = d;
       }
+    }
+
+    // Sync task dates if startDate of the Work batch is changed
+    if (dto.startDate && new Date(dto.startDate).getTime() !== new Date(oldStartDate!).getTime()) {
+      const newBaseDate = new Date(dto.startDate);
+      newBaseDate.setHours(0, 0, 0, 0);
+      work.startDate = newBaseDate;
+
+      const tasks = await this.workTaskRepo.find({ where: { workId: id + "" } });
+      for (const t of tasks) {
+        const newTaskDate = new Date(newBaseDate);
+        newTaskDate.setDate(newTaskDate.getDate() + (t.offsetDays || 0));
+        t.startDate = newTaskDate;
+      }
+      await this.workTaskRepo.save(tasks);
+      this.logger.log(`Synced ${tasks.length} task dates for Work ${id} due to startDate change`);
     }
 
     const updated = await this.workRepo.save(work);

@@ -23,6 +23,9 @@ export class WorkTask extends BaseAuditEntity {
   @Column({ type: "timestamptz", nullable: true })
   startDate?: Date;
 
+  @Column({ type: "int", default: 0 })
+  offsetDays!: number;
+
   @Column({ type: "boolean", default: false })
   employeeChecked!: boolean;
 

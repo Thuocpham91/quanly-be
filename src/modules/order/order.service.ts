@@ -140,6 +140,12 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     }
 
     this.logger.log(`Order created with ID ${saved.id}`);
+
+    // If order created as DA_HOAN_THANH, record as INCOME
+    if (saved.status === OrderProposalStatusEnum.DA_HOAN_THANH) {
+      await this.recordIncomeFromOrder(saved);
+    }
+
     return this.buildResponse(saved, {}, HttpStatus.CREATED);
   }
 
@@ -164,20 +170,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
 
     // If status changed to DA_HOAN_THANH, record as INCOME in Expense Management
     if (updated.status === OrderProposalStatusEnum.DA_HOAN_THANH && oldStatus !== OrderProposalStatusEnum.DA_HOAN_THANH) {
-      try {
-        await this.expenseService.create({
-          title: `Thu nhập từ đơn hàng #${updated.id}`,
-          amount: Number(updated.amount || 0),
-          date: updated.orderDate || new Date(),
-          category: 'Doanh thu đơn hàng',
-          type: 'INCOME',
-          workId: updated.workId,
-          description: `Tự động ghi nhận khi đơn hàng #${updated.id} hoàn thành.`
-        });
-        this.logger.log(`Automatically recorded INCOME for completed order #${updated.id}`);
-      } catch (err) {
-        this.logger.error(`Failed to auto-record income for order #${updated.id}:`, err);
-      }
+      await this.recordIncomeFromOrder(updated);
     }
 
     // Sync work info for both old and new work batches
@@ -246,6 +239,23 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
       data: undefined,
       message: SuccessCode.SUCCESS,
     };
+  }
+
+  private async recordIncomeFromOrder(order: Order) {
+    try {
+      await this.expenseService.create({
+        title: `Thu nhập từ đơn hàng #${order.id}`,
+        amount: Number(order.amount || 0),
+        date: order.orderDate || new Date(),
+        category: 'Doanh thu đơn hàng',
+        type: 'INCOME',
+        workId: order.workId,
+        description: `Tự động ghi nhận khi đơn hàng #${order.id} hoàn thành.`
+      });
+      this.logger.log(`Automatically recorded INCOME for completed order #${order.id}`);
+    } catch (err) {
+      this.logger.error(`Failed to auto-record income for order #${order.id}:`, err);
+    }
   }
 
   private async syncWorkInfo(workId: string) {
