@@ -252,16 +252,18 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     try {
       const existingExpense = await this.expenseService.findByOrderId(order.id);
       
-      const expenseData = {
+      const expenseData: any = {
         title: `Lợi nhuận từ đơn hàng #${order.id}`,
-        amount: Number(order.amount || 0),
+        amount: Math.abs(Number(order.amount || 0)), // Ensure amount is positive for Income
         date: order.orderDate || new Date(),
         category: 'Lợi nhuận đơn hàng',
-        type: 'INCOME' as const,
+        type: 'INCOME',
         workId: order.workId,
         orderId: order.id,
         description: `Tự động ghi nhận khi đơn hàng #${order.id} hoàn thành.`
       };
+
+      this.logger.log(`Recording income for order #${order.id} with type: ${expenseData.type}`);
 
       if (existingExpense) {
         await this.expenseService.update(existingExpense.id, expenseData);

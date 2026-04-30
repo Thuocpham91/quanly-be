@@ -73,11 +73,15 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
   }
 
   async update(id: string, dto: UpdateExpenseDto): Promise<{ statusCode: number; data: ExpenseResponseDto; message: string }> {
-    await this.expenseRepo.update(id, dto);
-    const updated = await this.expenseRepo.findOne({ where: { id }, relations: ["work"] });
+    const expense = await this.expenseRepo.findOne({ where: { id } });
+    if (!expense) {
+      throw new Error(`Expense with ID ${id} not found`);
+    }
+    Object.assign(expense, dto);
+    const saved = await this.expenseRepo.save(expense);
     return {
       statusCode: HttpStatus.OK,
-      data: this.toDto(updated, { work: WorkResponseDto }),
+      data: this.toDto(saved, { work: WorkResponseDto }),
       message: SuccessCode.SUCCESS,
     };
   }
