@@ -37,4 +37,12 @@ export class CustomerResponseDto {
   @Expose()
   @ApiProperty({ example: "2026-01-02T00:00:00.000Z" })
   updatedAt!: Date;
+
+  @Expose()
+  @ApiProperty()
+  userId?: string;
+
+  @Expose()
+  @ApiProperty({ type: [String] })
+  editorIds?: string[];
 }

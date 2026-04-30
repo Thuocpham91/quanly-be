@@ -17,13 +17,13 @@ export class CustomerController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Search and list customers" })
   async search(@Query() params: SearchCustomerDto, @CurrentUser() user: User): Promise<CustomerListResponse> {
-    return await this.customerService.search(params, user.id);
+    return await this.customerService.search(params, user);
   }
 
   @Get(":id")
   @ApiOperation({ summary: "Get customer details by ID" })
   async getById(@Param("id") id: string, @CurrentUser() user: User): Promise<CustomerResponse> {
-    return await this.customerService.getById(id, user.id);
+    return await this.customerService.getById(id, user);
   }
 
   @Post()
@@ -41,18 +41,28 @@ export class CustomerController {
     @Body() dto: UpdateCustomerDto,
     @CurrentUser() user: User,
   ): Promise<CustomerResponse> {
-    return await this.customerService.updateCustomer(id, dto, user.id);
+    return await this.customerService.updateCustomer(id, dto, user);
   }
 
   @Delete(":id")
   @ApiOperation({ summary: "Delete a customer" })
   async delete(@Param("id") id: string, @CurrentUser() user: User): Promise<CustomerResponse> {
-    return await this.customerService.deleteCustomer(id, user.id);
+    return await this.customerService.deleteCustomer(id, user);
   }
 
   @Get("user/:userCustomId")
   @ApiOperation({ summary: "Get customer details by linked User ID" })
   async getByUserId(@Param("userCustomId") userCustomId: string, @CurrentUser() user: User): Promise<CustomerResponse> {
-    return await this.customerService.findByUserCustomId(userCustomId, user.id);
+    return await this.customerService.findByUserCustomId(userCustomId, user);
+  }
+
+  @Post(":id/share")
+  @ApiOperation({ summary: "Share edit permission with other users" })
+  async share(
+    @Param("id") id: string,
+    @Body("editorIds") editorIds: string[],
+    @CurrentUser() user: User,
+  ): Promise<CustomerResponse> {
+    return await this.customerService.shareCustomer(id, editorIds, user);
   }
 }

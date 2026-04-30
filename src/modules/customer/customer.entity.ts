@@ -39,4 +39,7 @@ export class Customer extends BaseAuditEntity {
   @ManyToOne(() => User, { eager: false, onDelete: "CASCADE" })
   @JoinColumn({ name: "userCustomId", referencedColumnName: "id" })
   userCustom?: User;
+
+  @Column("simple-array", { nullable: true })
+  editorIds?: string[];
 }

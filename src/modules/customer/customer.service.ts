@@ -34,45 +34,50 @@ export class CustomerService {
     return await this.customerRepo.findOne(options);
   }
 
-  async search(params: SearchCustomerDto, userId: string): Promise<CustomerListResponse> {
+  async search(params: SearchCustomerDto, user: User): Promise<CustomerListResponse> {
+    const isAdminOrStaff = this.isAdminOrStaff(user);
     const query = this.customerRepo.createQueryBuilder("customer");
-
-    // Filter by userId
-    query.andWhere("customer.userId = :userId", { userId });
-
+ 
+    if (!isAdminOrStaff) {
+      query.andWhere("customer.userId = :userId", { userId: user.id });
+    }
+ 
     if (params.keyword) {
       query.andWhere("customer.name ILIKE :keyword OR customer.email ILIKE :keyword", {
         keyword: `%${params.keyword}%`,
       });
     }
-
+ 
     if (typeof params.isActive === "boolean") {
       query.andWhere("customer.isActive = :isActive", { isActive: params.isActive });
     }
-
+ 
     const sortBy = params.sortBy || "customer.createdAt";
     const sortOrder = params.sortOrder || "DESC";
-
+ 
     query.orderBy(sortBy, sortOrder as "ASC" | "DESC");
-
+ 
     const page = params.page || 1;
     const limit = params.limit || 10;
     const [items] = await query
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
-
+ 
     return {
       statusCode: HttpStatus.OK,
       message: SuccessCode.SUCCESS,
       data: items.map((item) => this.toDto(item)),
     };
   }
-
-  async getById(id: string, userId: string): Promise<CustomerResponse> {
-    const customer = await this.customerRepo.findOne({ where: { id, userId } });
+ 
+  async getById(id: string, user: User): Promise<CustomerResponse> {
+    const isAdminOrStaff = this.isAdminOrStaff(user);
+    const where = isAdminOrStaff ? { id } : { id, userId: user.id };
+    
+    const customer = await this.customerRepo.findOne({ where });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
-
+ 
     return {
       statusCode: HttpStatus.OK,
       message: SuccessCode.SUCCESS,
@@ -127,18 +132,28 @@ export class CustomerService {
     };
   }
 
-  async updateCustomer(id: string, dto: UpdateCustomerDto, userId: string): Promise<CustomerResponse> {
-    const customer = await this.customerRepo.findOne({ where: { id, userId } });
+  async updateCustomer(id: string, dto: UpdateCustomerDto, user: User): Promise<CustomerResponse> {
+    const isAdminOrManager = this.isAdminOrManager(user);
+    const isAdminOrStaff = this.isAdminOrStaff(user);
+    
+    const where = isAdminOrStaff ? { id } : { id, userId: user.id };
+    const customer = await this.customerRepo.findOne({ where });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
 
+    const isAllowedEditor = customer.editorIds && customer.editorIds.includes(user.id);
+
+    if (!isAdminOrManager && customer.userId !== user.id && !isAllowedEditor) {
+      throw new Error("Bạn không có quyền chỉnh sửa khách hàng này.");
+    }
+
     if (dto.email && dto.email !== customer.email) {
-      const existing = await this.customerRepo.findOne({ where: { email: dto.email, userId } });
+      const existing = await this.customerRepo.findOne({ where: { email: dto.email, userId: user.id } });
       if (existing) throw new ConflictException(`Customer with email ${dto.email} already exists for this user`);
     }
 
     Object.assign(customer, dto);
     const updated = await this.customerRepo.save(customer);
-    this.logger.log(`Customer updated: ${id} for user: ${userId}`);
+    this.logger.log(`Customer updated: ${id} for user: ${user.id}`);
 
     return {
       statusCode: HttpStatus.OK,
@@ -147,12 +162,22 @@ export class CustomerService {
     };
   }
 
-  async deleteCustomer(id: string, userId: string): Promise<CustomerResponse> {
-    const customer = await this.customerRepo.findOne({ where: { id, userId } });
+  async deleteCustomer(id: string, user: User): Promise<CustomerResponse> {
+    const isAdminOrManager = this.isAdminOrManager(user);
+    const isAdminOrStaff = this.isAdminOrStaff(user);
+    
+    const where = isAdminOrStaff ? { id } : { id, userId: user.id };
+    const customer = await this.customerRepo.findOne({ where });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
 
+    const isAllowedEditor = customer.editorIds && customer.editorIds.includes(user.id);
+
+    if (!isAdminOrManager && customer.userId !== user.id && !isAllowedEditor) {
+      throw new Error("Bạn không có quyền xóa khách hàng này.");
+    }
+
     await this.customerRepo.softRemove(customer);
-    this.logger.log(`Customer deleted: ${id} for user: ${userId}`);
+    this.logger.log(`Customer deleted: ${id} for user: ${user.id}`);
 
     return {
       statusCode: HttpStatus.OK,
@@ -161,12 +186,28 @@ export class CustomerService {
     };
   }
 
-  async findByUserCustomId(userCustomId: string, userId: string): Promise<CustomerResponse> {
+  async shareCustomer(id: string, editorIds: string[], user: User): Promise<CustomerResponse> {
+    const customer = await this.customerRepo.findOne({ where: { id } });
+    if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
+
+    const isAdminOrManager = this.isAdminOrManager(user);
+    if (!isAdminOrManager && customer.userId !== user.id) {
+      throw new Error("Chỉ người tạo hoặc quản lý mới có quyền cấp quyền chỉnh sửa.");
+    }
+
+    customer.editorIds = editorIds;
+    const updated = await this.customerRepo.save(customer);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: SuccessCode.SUCCESS,
+      data: this.toDto(updated),
+    };
+  }
+
+  async findByUserCustomId(userCustomId: string, user: User): Promise<CustomerResponse> {
     const customer = await this.customerRepo.findOne({ 
-      where: [
-        { userCustomId: userCustomId, userId: userId },
-        { userCustomId: userCustomId } // Fallback to global if needed
-      ]
+      where: { userCustomId: userCustomId }
     });
     
     if (!customer) throw new NotFoundException(`No customer found for User ID ${userCustomId}`);
@@ -176,5 +217,15 @@ export class CustomerService {
       message: SuccessCode.SUCCESS,
       data: this.toDto(customer),
     };
+  }
+
+  private isAdminOrStaff(user: any): boolean {
+    const roleCode = user.role?.code || '';
+    return ['ADMIN', 'MANAGER', 'STAFF'].includes(roleCode);
+  }
+
+  private isAdminOrManager(user: any): boolean {
+    const roleCode = user.role?.code || '';
+    return ['ADMIN', 'MANAGER'].includes(roleCode);
   }
 }
