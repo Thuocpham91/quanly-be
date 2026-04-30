@@ -43,6 +43,9 @@ export class Customer extends BaseAuditEntity {
   @Column("simple-array", { nullable: true })
   editorIds?: string[];
 
+  @Column({ type: "boolean", default: false })
+  isSelfCustomer: boolean = false;
+
   @Column({ type: "numeric", precision: 10, scale: 7, nullable: true })
   lat?: number;
 

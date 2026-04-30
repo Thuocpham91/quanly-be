@@ -44,6 +44,11 @@ export class CreateCustomerDto {
   @ApiPropertyOptional()
   @IsOptional()
   lng?: number;
+
+  @ApiPropertyOptional({ example: false })
+  @IsBoolean()
+  @IsOptional()
+  isSelfCustomer?: boolean;
 }
 
 export class UpdateCustomerDto {
@@ -87,6 +92,11 @@ export class UpdateCustomerDto {
   @ApiPropertyOptional()
   @IsOptional()
   lng?: number;
+
+  @ApiPropertyOptional({ example: false })
+  @IsBoolean()
+  @IsOptional()
+  isSelfCustomer?: boolean;
 }
 
 export class SearchCustomerDto extends BaseSearchDto {

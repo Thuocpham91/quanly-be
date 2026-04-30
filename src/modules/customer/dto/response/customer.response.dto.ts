@@ -53,4 +53,8 @@ export class CustomerResponseDto {
   @Expose()
   @ApiProperty()
   lng?: number;
+
+  @Expose()
+  @ApiProperty({ example: false })
+  isSelfCustomer!: boolean;
 }
