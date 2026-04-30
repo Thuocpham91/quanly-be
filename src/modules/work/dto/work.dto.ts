@@ -79,6 +79,12 @@ export class UpdateWorkDto {
   @IsOptional()
   workDate?: Date;
 
+  @ApiPropertyOptional({ description: "Work start date" })
+  @Type(() => Date)
+  @IsDate()
+  @IsOptional()
+  startDate?: Date;
+
   @ApiPropertyOptional({ description: "Employee check status" })
   @Type(() => Boolean)
   @IsBoolean()
