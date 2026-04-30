@@ -45,4 +45,12 @@ export class CustomerResponseDto {
   @Expose()
   @ApiProperty({ type: [String] })
   editorIds?: string[];
+
+  @Expose()
+  @ApiProperty()
+  lat?: number;
+
+  @Expose()
+  @ApiProperty()
+  lng?: number;
 }

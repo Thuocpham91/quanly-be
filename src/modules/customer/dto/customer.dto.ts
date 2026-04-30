@@ -36,6 +36,14 @@ export class CreateCustomerDto {
   @IsString()
   @IsOptional()
   userCustomId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  lat?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  lng?: number;
 }
 
 export class UpdateCustomerDto {
@@ -71,6 +79,14 @@ export class UpdateCustomerDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  lat?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  lng?: number;
 }
 
 export class SearchCustomerDto extends BaseSearchDto {

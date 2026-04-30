@@ -42,4 +42,10 @@ export class Customer extends BaseAuditEntity {
 
   @Column("simple-array", { nullable: true })
   editorIds?: string[];
+
+  @Column({ type: "numeric", precision: 10, scale: 7, nullable: true })
+  lat?: number;
+
+  @Column({ type: "numeric", precision: 10, scale: 7, nullable: true })
+  lng?: number;
 }
