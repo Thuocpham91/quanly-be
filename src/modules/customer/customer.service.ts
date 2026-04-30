@@ -206,11 +206,28 @@ export class CustomerService {
   }
 
   async findByUserCustomId(userCustomId: string, user: User): Promise<CustomerResponse> {
-    const customer = await this.customerRepo.findOne({ 
+    let customer = await this.customerRepo.findOne({ 
       where: { userCustomId: userCustomId }
     });
     
-    if (!customer) throw new NotFoundException(`No customer found for User ID ${userCustomId}`);
+    if (!customer) {
+      // Auto-create if not exists
+      this.logger.log(`Customer record not found for user ${userCustomId}. Attempting auto-creation...`);
+      const targetUser = await this.userRepo.findOne({ where: { id: userCustomId } });
+      if (targetUser) {
+        const createDto: CreateCustomerDto = {
+          name: targetUser.fullName || targetUser.username,
+          email: targetUser.email,
+          phone: targetUser.phone,
+          userCustomId: userCustomId,
+          isSelfCustomer: true,
+          note: "Hồ sơ tự động tạo khi truy cập từ lịch trình"
+        };
+        const res = await this.createCustomer(createDto, user.id);
+        return res;
+      }
+      throw new NotFoundException(`No customer found for User ID ${userCustomId}`);
+    }
 
     return {
       statusCode: HttpStatus.OK,
