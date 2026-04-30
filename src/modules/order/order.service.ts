@@ -253,10 +253,10 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
       const existingExpense = await this.expenseService.findByOrderId(order.id);
       
       const expenseData = {
-        title: `Thu nhập từ đơn hàng #${order.id}`,
+        title: `Lợi nhuận từ đơn hàng #${order.id}`,
         amount: Number(order.amount || 0),
         date: order.orderDate || new Date(),
-        category: 'Doanh thu đơn hàng',
+        category: 'Lợi nhuận đơn hàng',
         type: 'INCOME' as const,
         workId: order.workId,
         orderId: order.id,
