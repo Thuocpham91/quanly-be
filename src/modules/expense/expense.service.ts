@@ -89,4 +89,8 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
       message: SuccessCode.SUCCESS,
     };
   }
+
+  async findByOrderId(orderId: string): Promise<Expense | null> {
+    return this.expenseRepo.findOne({ where: { orderId } });
+  }
 }

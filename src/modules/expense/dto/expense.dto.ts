@@ -38,6 +38,11 @@ export class CreateExpenseDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
+  orderId?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
   description?: string;
 }
 
@@ -72,6 +77,11 @@ export class UpdateExpenseDto {
   @IsString()
   @IsOptional()
   workId?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  orderId?: string;
 
   @ApiPropertyOptional()
   @IsString()

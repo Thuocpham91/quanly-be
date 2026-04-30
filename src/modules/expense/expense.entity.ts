@@ -32,6 +32,9 @@ export class Expense extends BaseAuditEntity {
   @JoinColumn({ name: "workId" })
   work?: Work;
 
+  @Column({ type: "bigint", nullable: true })
+  orderId?: string;
+
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string;
 }

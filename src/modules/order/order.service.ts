@@ -168,9 +168,16 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
 
     const updated = await this.orderRepo.save(order);
 
-    // If status changed to DA_HOAN_THANH, record as INCOME in Expense Management
-    if (updated.status === OrderProposalStatusEnum.DA_HOAN_THANH && oldStatus !== OrderProposalStatusEnum.DA_HOAN_THANH) {
+    // Sync income in Expense Management if order is completed
+    if (updated.status === OrderProposalStatusEnum.DA_HOAN_THANH) {
       await this.recordIncomeFromOrder(updated);
+    } else if (oldStatus === OrderProposalStatusEnum.DA_HOAN_THANH && updated.status !== OrderProposalStatusEnum.DA_HOAN_THANH) {
+      // If status changed AWAY from completed, remove the income record
+      const existingExpense = await this.expenseService.findByOrderId(updated.id);
+      if (existingExpense) {
+        await this.expenseService.delete(existingExpense.id);
+        this.logger.log(`Removed INCOME record for order #${updated.id} because status changed to ${updated.status}`);
+      }
     }
 
     // Sync work info for both old and new work batches
@@ -243,18 +250,28 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
 
   private async recordIncomeFromOrder(order: Order) {
     try {
-      await this.expenseService.create({
+      const existingExpense = await this.expenseService.findByOrderId(order.id);
+      
+      const expenseData = {
         title: `Thu nhập từ đơn hàng #${order.id}`,
         amount: Number(order.amount || 0),
         date: order.orderDate || new Date(),
         category: 'Doanh thu đơn hàng',
-        type: 'INCOME',
+        type: 'INCOME' as const,
         workId: order.workId,
+        orderId: order.id,
         description: `Tự động ghi nhận khi đơn hàng #${order.id} hoàn thành.`
-      });
-      this.logger.log(`Automatically recorded INCOME for completed order #${order.id}`);
+      };
+
+      if (existingExpense) {
+        await this.expenseService.update(existingExpense.id, expenseData);
+        this.logger.log(`Updated INCOME record for order #${order.id}`);
+      } else {
+        await this.expenseService.create(expenseData);
+        this.logger.log(`Automatically recorded NEW INCOME for completed order #${order.id}`);
+      }
     } catch (err) {
-      this.logger.error(`Failed to auto-record income for order #${order.id}:`, err);
+      this.logger.error(`Failed to sync income for order #${order.id}:`, err);
     }
   }
 
