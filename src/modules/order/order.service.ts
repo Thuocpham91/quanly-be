@@ -171,7 +171,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     // Sync income in Expense Management if order is completed
     if (updated.status === OrderProposalStatusEnum.DA_HOAN_THANH) {
       await this.recordIncomeFromOrder(updated);
-    } else if (oldStatus === OrderProposalStatusEnum.DA_HOAN_THANH && updated.status !== OrderProposalStatusEnum.DA_HOAN_THANH) {
+    } else if (oldStatus === OrderProposalStatusEnum.DA_HOAN_THANH) {
       // If status changed AWAY from completed, remove the income record
       const existingExpense = await this.expenseService.findByOrderId(updated.id);
       if (existingExpense) {
