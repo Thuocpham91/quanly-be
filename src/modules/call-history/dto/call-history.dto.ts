@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsIn } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateCallHistoryDto {
@@ -18,4 +18,22 @@ export class SearchCallHistoryDto {
   @IsOptional()
   @IsString()
   customerId?: string;
+}
+
+export type CallFilterType =
+  | "NOT_CALLED"
+  | "CALLED_10"
+  | "CALLED_60"
+  | "NO_CALL_10"
+  | "NO_CALL_60"
+  | "NO_CALL_5M";
+
+export class CallStatusFilterDto {
+  @ApiPropertyOptional({
+    description: "Filter customers by call status",
+    enum: ["NOT_CALLED", "CALLED_10", "CALLED_60", "NO_CALL_10", "NO_CALL_60", "NO_CALL_5M"],
+  })
+  @IsOptional()
+  @IsIn(["NOT_CALLED", "CALLED_10", "CALLED_60", "NO_CALL_10", "NO_CALL_60", "NO_CALL_5M"])
+  callFilter?: CallFilterType;
 }
