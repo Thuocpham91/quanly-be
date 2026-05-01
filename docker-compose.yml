@@ -12,8 +12,6 @@ services:
     container_name: quanly-be-service-db
     ports:
       - "${DB_PORT}:5432"
-    env_file:
-      - .env.sit
     environment:
       TZ: UTC
       POSTGRES_USER: ${DB_USERNAME}
@@ -44,8 +42,6 @@ services:
       - quanly-be-service-db
     ports:
       - "${PORT}:${PORT}"
-    env_file:
-      - .env.sit
     restart: always
     environment:
       ENVIRONMENT: ${ENVIRONMENT}
