@@ -17,6 +17,7 @@ import { MonthlyPayoutModule } from "./modules/monthly-payout/monthly-payout.mod
 import { ChickenPriceModule } from "./modules/chicken-price/chicken-price.module";
 import { FileModule } from "@modules/file/file.module";
 import { ExpenseModule } from "./modules/expense/expense.module";
+import { CallHistoryModule } from "./modules/call-history/call-history.module";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ExpenseModule } from "./modules/expense/expense.module";
     ChickenPriceModule,
     FileModule,
     ExpenseModule,
+    CallHistoryModule,
   ],
 })
 export class AppModule {}
