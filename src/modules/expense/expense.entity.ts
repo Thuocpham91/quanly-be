@@ -11,13 +11,19 @@ export class Expense extends BaseAuditEntity {
   title!: string;
 
   @Column({ type: "varchar", length: 20, default: "EXPENSE" })
-  type!: "INCOME" | "EXPENSE";
+  type!: "INCOME" | "EXPENSE" | "DEBT";
 
   @Column({ type: "decimal", precision: 15, scale: 2, transformer: {
     to: (value: number) => value,
     from: (value: string) => parseFloat(value)
   }})
   amount!: number;
+
+  @Column({ type: "decimal", precision: 15, scale: 2, default: 0, transformer: {
+    to: (value: number) => value,
+    from: (value: string) => parseFloat(value)
+  }})
+  paidAmount!: number;
 
   @Column({ type: "timestamptz" })
   date!: Date;
@@ -34,6 +40,18 @@ export class Expense extends BaseAuditEntity {
 
   @Column({ type: "bigint", nullable: true })
   orderId?: string;
+
+  @Column({ type: "varchar", length: 20, nullable: true })
+  debtType?: "RECEIVABLE" | "PAYABLE";
+
+  @Column({ type: "varchar", length: 20, nullable: true })
+  debtStatus?: "PENDING" | "PAID";
+
+  @Column({ type: "varchar", length: 255, nullable: true })
+  debtorName?: string;
+
+  @Column({ type: "timestamptz", nullable: true })
+  dueDate?: Date;
 
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string;

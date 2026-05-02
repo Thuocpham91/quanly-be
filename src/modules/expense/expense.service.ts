@@ -19,6 +19,17 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
 
   async create(dto: CreateExpenseDto): Promise<{ statusCode: number; data: ExpenseResponseDto; message: string }> {
     const expense = this.expenseRepo.create(dto);
+    
+    // If not DEBT, usually it's fully paid
+    if (expense.type !== 'DEBT' && expense.paidAmount === undefined) {
+      expense.paidAmount = expense.amount;
+    }
+
+    // Auto update status based on paid amount
+    if (expense.type === 'DEBT') {
+      expense.debtStatus = expense.paidAmount >= expense.amount ? 'PAID' : 'PENDING';
+    }
+
     const saved = await this.expenseRepo.save(expense);
     return {
       statusCode: HttpStatus.CREATED,
@@ -52,6 +63,14 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
       qb.andWhere("entity.workId = :workId", { workId });
     }
 
+    if (query.debtStatus) {
+      qb.andWhere("entity.debtStatus = :debtStatus", { debtStatus: query.debtStatus });
+    }
+
+    if (query.debtType) {
+      qb.andWhere("entity.debtType = :debtType", { debtType: query.debtType });
+    }
+
     if (fromDate) {
       qb.andWhere("entity.date >= :fromDate", { fromDate });
     }
@@ -78,6 +97,12 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
       throw new Error(`Expense with ID ${id} not found`);
     }
     Object.assign(expense, dto);
+
+    // Auto update status if it's a debt
+    if (expense.type === 'DEBT') {
+      expense.debtStatus = expense.paidAmount >= expense.amount ? 'PAID' : 'PENDING';
+    }
+
     const saved = await this.expenseRepo.save(expense);
     return {
       statusCode: HttpStatus.OK,

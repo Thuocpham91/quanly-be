@@ -17,6 +17,10 @@ export class ExpenseResponseDto {
 
   @Expose()
   @ApiProperty()
+  paidAmount!: number;
+
+  @Expose()
+  @ApiProperty()
   date!: Date;
 
   @Expose()
@@ -24,8 +28,8 @@ export class ExpenseResponseDto {
   category!: string;
 
   @Expose()
-  @ApiProperty({ enum: ['INCOME', 'EXPENSE'] })
-  type!: "INCOME" | "EXPENSE";
+  @ApiProperty({ enum: ['INCOME', 'EXPENSE', 'DEBT'] })
+  type!: "INCOME" | "EXPENSE" | "DEBT";
 
   @Expose()
   @ApiPropertyOptional()
@@ -35,6 +39,22 @@ export class ExpenseResponseDto {
   @Type(() => WorkResponseDto)
   @ApiPropertyOptional({ type: () => WorkResponseDto })
   work?: WorkResponseDto;
+
+  @Expose()
+  @ApiPropertyOptional({ enum: ['RECEIVABLE', 'PAYABLE'] })
+  debtType?: "RECEIVABLE" | "PAYABLE";
+
+  @Expose()
+  @ApiPropertyOptional({ enum: ['PENDING', 'PAID'] })
+  debtStatus?: "PENDING" | "PAID";
+
+  @Expose()
+  @ApiPropertyOptional()
+  debtorName?: string;
+
+  @Expose()
+  @ApiPropertyOptional()
+  dueDate?: Date;
 
   @Expose()
   @ApiPropertyOptional()

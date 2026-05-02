@@ -14,6 +14,11 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   amount!: number;
 
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  paidAmount?: number;
+
   @ApiProperty()
   @Type(() => Date)
   @IsDate()
@@ -25,10 +30,10 @@ export class CreateExpenseDto {
   @IsNotEmpty()
   category!: string;
 
-  @ApiProperty({ enum: ['INCOME', 'EXPENSE'], default: 'EXPENSE' })
+  @ApiProperty({ enum: ['INCOME', 'EXPENSE', 'DEBT'], default: 'EXPENSE' })
   @IsString()
   @IsOptional()
-  type?: "INCOME" | "EXPENSE";
+  type?: "INCOME" | "EXPENSE" | "DEBT";
 
   @ApiPropertyOptional()
   @IsString()
@@ -39,6 +44,27 @@ export class CreateExpenseDto {
   @IsString()
   @IsOptional()
   orderId?: string;
+
+  @ApiPropertyOptional({ enum: ['RECEIVABLE', 'PAYABLE'] })
+  @IsString()
+  @IsOptional()
+  debtType?: "RECEIVABLE" | "PAYABLE";
+
+  @ApiPropertyOptional({ enum: ['PENDING', 'PAID'] })
+  @IsString()
+  @IsOptional()
+  debtStatus?: "PENDING" | "PAID";
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  debtorName?: string;
+
+  @ApiPropertyOptional()
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  dueDate?: Date;
 
   @ApiPropertyOptional()
   @IsString()
@@ -58,6 +84,11 @@ export class UpdateExpenseDto {
   amount?: number;
 
   @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  paidAmount?: number;
+
+  @ApiPropertyOptional()
   @Type(() => Date)
   @IsDate()
   @IsOptional()
@@ -68,10 +99,10 @@ export class UpdateExpenseDto {
   @IsOptional()
   category?: string;
 
-  @ApiPropertyOptional({ enum: ['INCOME', 'EXPENSE'] })
+  @ApiPropertyOptional({ enum: ['INCOME', 'EXPENSE', 'DEBT'] })
   @IsString()
   @IsOptional()
-  type?: "INCOME" | "EXPENSE";
+  type?: "INCOME" | "EXPENSE" | "DEBT";
 
   @ApiPropertyOptional()
   @IsString()
@@ -82,6 +113,27 @@ export class UpdateExpenseDto {
   @IsString()
   @IsOptional()
   orderId?: string;
+
+  @ApiPropertyOptional({ enum: ['RECEIVABLE', 'PAYABLE'] })
+  @IsString()
+  @IsOptional()
+  debtType?: "RECEIVABLE" | "PAYABLE";
+
+  @ApiPropertyOptional({ enum: ['PENDING', 'PAID'] })
+  @IsString()
+  @IsOptional()
+  debtStatus?: "PENDING" | "PAID";
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  debtorName?: string;
+
+  @ApiPropertyOptional()
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  dueDate?: Date;
 
   @ApiPropertyOptional()
   @IsString()
@@ -95,15 +147,25 @@ export class SearchExpenseDto extends BaseSearchDto {
   @IsOptional()
   category?: string;
 
-  @ApiPropertyOptional({ enum: ['INCOME', 'EXPENSE'] })
+  @ApiPropertyOptional({ enum: ['INCOME', 'EXPENSE', 'DEBT'] })
   @IsString()
   @IsOptional()
-  type?: "INCOME" | "EXPENSE";
+  type?: "INCOME" | "EXPENSE" | "DEBT";
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   workId?: string;
+
+  @ApiPropertyOptional({ enum: ['PENDING', 'PAID'] })
+  @IsString()
+  @IsOptional()
+  debtStatus?: "PENDING" | "PAID";
+
+  @ApiPropertyOptional({ enum: ['RECEIVABLE', 'PAYABLE'] })
+  @IsString()
+  @IsOptional()
+  debtType?: "RECEIVABLE" | "PAYABLE";
 
   @ApiPropertyOptional()
   @IsString()
