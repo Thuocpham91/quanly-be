@@ -31,4 +31,10 @@ export class ExpenseController {
   async delete(@Param("id") id: string) {
     return await this.expenseService.delete(id);
   }
+
+  @Get(":id/history")
+  @ApiOperation({ summary: "Get expense update history" })
+  async getHistory(@Param("id") id: string) {
+    return await this.expenseService.getHistory(id);
+  }
 }

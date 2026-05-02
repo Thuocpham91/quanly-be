@@ -2,6 +2,7 @@ import { Injectable, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Expense } from "./expense.entity";
+import { ExpenseHistory } from "./expense-history.entity";
 import { CreateExpenseDto, UpdateExpenseDto, SearchExpenseDto } from "./dto/expense.dto";
 import { ExpenseResponseDto, ExpenseListResponse } from "./dto/response/expense.response";
 import { BaseService } from "@common/services/base.service";
@@ -13,6 +14,8 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
   constructor(
     @InjectRepository(Expense)
     private readonly expenseRepo: Repository<Expense>,
+    @InjectRepository(ExpenseHistory)
+    private readonly historyRepo: Repository<ExpenseHistory>,
   ) {
     super(expenseRepo, ExpenseResponseDto);
   }
@@ -96,6 +99,7 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
     if (!expense) {
       throw new Error(`Expense with ID ${id} not found`);
     }
+    const oldPaidAmount = expense.paidAmount;
     Object.assign(expense, dto);
 
     // Auto update status if it's a debt
@@ -104,9 +108,33 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
     }
 
     const saved = await this.expenseRepo.save(expense);
+
+    // Record history if paidAmount changed
+    if (dto.paidAmount !== undefined && dto.paidAmount !== oldPaidAmount) {
+      await this.historyRepo.save({
+        expenseId: id,
+        oldPaidAmount,
+        newPaidAmount: dto.paidAmount,
+        changeAmount: dto.paidAmount - oldPaidAmount,
+        note: dto.description || 'Cập nhật số tiền thanh toán'
+      });
+    }
+
     return {
       statusCode: HttpStatus.OK,
       data: this.toDto(saved, { work: WorkResponseDto }),
+      message: SuccessCode.SUCCESS,
+    };
+  }
+
+  async getHistory(expenseId: string): Promise<{ statusCode: number; data: any[]; message: string }> {
+    const histories = await this.historyRepo.find({
+      where: { expenseId },
+      order: { createdAt: "DESC" }
+    });
+    return {
+      statusCode: HttpStatus.OK,
+      data: histories,
       message: SuccessCode.SUCCESS,
     };
   }

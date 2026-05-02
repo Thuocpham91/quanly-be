@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { BaseAuditEntity } from "@common/entity/base-audit.entity";
 import { Work } from "../work/work.entity";
+import { ExpenseHistory } from "./expense-history.entity";
 
 @Entity({ name: "EXPENSE", schema: "public" })
 export class Expense extends BaseAuditEntity {
@@ -55,4 +56,7 @@ export class Expense extends BaseAuditEntity {
 
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string;
+
+  @OneToMany(() => ExpenseHistory, (history) => history.expense)
+  histories?: ExpenseHistory[];
 }
