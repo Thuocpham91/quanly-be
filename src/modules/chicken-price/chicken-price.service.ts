@@ -47,7 +47,7 @@ export class ChickenPriceService {
   async delete(id: number): Promise<any> {
     const entity = await this.repo.findOne({ where: { id: id + "" } });
     if (!entity) throw new NotFoundException(`ChickenPrice with ID ${id} not found`);
-    await this.repo.remove(entity);
+    await this.repo.softRemove(entity);
     return { statusCode: HttpStatus.OK, message: "Deleted successfully" };
   }
 }

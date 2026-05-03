@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { BaseAuditEntity } from "@common/entity/base-audit.entity";
 
 @Entity({ name: "CHICKEN_PRICE", schema: "public" })
-export class ChickenPrice {
+export class ChickenPrice extends BaseAuditEntity {
   @PrimaryGeneratedColumn({ type: "bigint" })
   id!: string;
 
@@ -26,9 +27,4 @@ export class ChickenPrice {
   @Column({ type: "text", nullable: true })
   note?: string;
 
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }

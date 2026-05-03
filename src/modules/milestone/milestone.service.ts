@@ -62,7 +62,7 @@ export class MilestoneService {
     const milestone = await this.repo.findOne({ where: { id: id + "" } });
     if (!milestone) throw new NotFoundException(`Milestone with ID ${id} not found`);
 
-    await this.repo.remove(milestone);
+    await this.repo.softRemove(milestone);
     
     return {
       statusCode: HttpStatus.OK,

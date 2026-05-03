@@ -99,7 +99,7 @@ export class UserService extends BaseService<User, UserResponseDto> {
     const user = await this.userRepo.findOne({ where: { id: id + "" } });
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
 
-    await this.userRepo.remove(user);
+    await this.userRepo.softRemove(user);
     this.logger.log(`User deleted with ID ${id}`);
 
     return {

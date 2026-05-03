@@ -140,7 +140,7 @@ export class ExpenseService extends BaseService<Expense, ExpenseResponseDto> {
   }
 
   async delete(id: string): Promise<{ statusCode: number; message: string }> {
-    await this.expenseRepo.delete(id);
+    await this.expenseRepo.softDelete(id);
     return {
       statusCode: HttpStatus.OK,
       message: SuccessCode.SUCCESS,

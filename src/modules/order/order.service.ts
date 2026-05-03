@@ -235,7 +235,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
 
     const workId = order.workId;
     const userId = order.userId;
-    await this.orderRepo.remove(order);
+    await this.orderRepo.softRemove(order);
 
     if (workId) await this.syncWorkInfo(workId);
     if (userId) await this.updateMonthlyPayout(userId);

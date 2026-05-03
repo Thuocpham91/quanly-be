@@ -84,7 +84,7 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     const object = await this.objectRepo.findOne({ where: { id: id + "" } });
     if (!object) throw new NotFoundException(`Object with ID ${id} not found`);
 
-    await this.objectRepo.remove(object);
+    await this.objectRepo.softRemove(object);
     this.logger.log(`Object deleted with ID ${id}`);
 
     return {
@@ -166,7 +166,7 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     const task = await this.taskRepo.findOne({ where: { id: taskId, objectId: objectId + "" } });
     if (!task) throw new NotFoundException(`Task with ID ${taskId} not found for this object`);
 
-    await this.taskRepo.remove(task);
+    await this.taskRepo.softRemove(task);
 
     return {
       statusCode: HttpStatus.OK,

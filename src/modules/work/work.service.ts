@@ -348,7 +348,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     const task = await this.workTaskRepo.findOne({ where: { id: id + "" } });
     if (!task) throw new NotFoundException(`WorkTask with ID ${id} not found`);
 
-    await this.workTaskRepo.remove(task);
+    await this.workTaskRepo.softRemove(task);
 
     return {
       statusCode: HttpStatus.OK,
@@ -407,7 +407,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     const work = await this.workRepo.findOne({ where: { id: id + "" } });
     if (!work) throw new NotFoundException(`Work with ID ${id} not found`);
 
-    await this.workRepo.remove(work);
+    await this.workRepo.softRemove(work);
     this.logger.log(`Work deleted with ID ${id}`);
 
     return {
