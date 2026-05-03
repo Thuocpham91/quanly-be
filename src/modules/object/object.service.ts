@@ -31,7 +31,7 @@ export class ObjectService extends BaseService<ObjectEntity, ObjectResponseDto> 
     const [objects, total] = await this.objectRepo.findAndCount({
       skip,
       take,
-      order: { id: "DESC" }
+      order: { status: "ASC", id: "DESC" }
     });
 
     return {

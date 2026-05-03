@@ -60,6 +60,12 @@ export class CreateWorkDto {
   @IsInt()
   @IsOptional()
   removalCount?: number;
+
+  @ApiPropertyOptional({ description: "Start from which day in object tasks" })
+  @Type(() => Number)
+  @IsInt()
+  @IsOptional()
+  startDay?: number;
 }
 
 export class UpdateWorkDto {

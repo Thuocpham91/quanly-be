@@ -26,6 +26,10 @@ export class ObjectResponseDto {
   @ApiPropertyOptional()
   @Expose()
   quantity?: number;
+
+  @ApiPropertyOptional()
+  @Expose()
+  status?: string;
 }
 
 export interface ObjectResponse {

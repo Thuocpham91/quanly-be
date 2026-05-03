@@ -55,4 +55,9 @@ export class UpdateObjectDto {
   @IsInt()
   @IsOptional()
   quantity?: number;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  status?: string;
 }

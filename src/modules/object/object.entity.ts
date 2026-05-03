@@ -7,6 +7,11 @@ export enum ObjectType {
   VAO_GA = "vào gà",
 }
 
+export enum ObjectStatus {
+  ACTIVE = "ACTIVE",
+  FINISHED = "FINISHED",
+}
+
 @Entity({ name: "OBJECT", schema: "public" })
 export class ObjectEntity extends BaseAuditEntity {
   @PrimaryGeneratedColumn({ type: "bigint" })
@@ -30,6 +35,13 @@ export class ObjectEntity extends BaseAuditEntity {
 
   @Column({ type: "int", nullable: true })
   quantity?: number;
+
+  @Column({
+    type: "enum",
+    enum: ObjectStatus,
+    default: ObjectStatus.ACTIVE,
+  })
+  status!: ObjectStatus;
 
   @OneToMany(() => ObjectTask, (task) => task.object, { cascade: true })
   tasks?: ObjectTask[];

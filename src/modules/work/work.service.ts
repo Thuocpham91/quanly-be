@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, HttpStatus, Logger, BadRequestException 
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Work } from "./work.entity";
-import { ObjectEntity } from "../object/object.entity";
+import { ObjectEntity, ObjectStatus } from "../object/object.entity";
 import { ObjectTask } from "../object/object-task.entity";
 import { WorkResponseDto, WorkListResponse, WorkResponse } from "./dto/response/work.response";
 import { BaseService } from "@common/services/base.service";
@@ -176,10 +176,14 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
 
     const savedWork = await this.workRepo.save(work);
 
-    // 4. Create child WorkTask entities for each predefined Task
-    const workTasks = tasks.map((task) => {
+    // 4. Create child WorkTask entities for each predefined Task (Filtered by startDay)
+    const startOffset = Number(dto.startDay || 0);
+    const filteredTasks = tasks.filter((t) => Number(t.workDate) >= startOffset);
+
+    const workTasks = filteredTasks.map((task) => {
       const taskDate = new Date(baseDate);
-      taskDate.setDate(taskDate.getDate() + Number(task.workDate));
+      // Adjust date: if we start from Day 10 on baseDate, then Day 15 is baseDate + (15 - 10)
+      taskDate.setDate(taskDate.getDate() + (Number(task.workDate) - startOffset));
 
       return this.workTaskRepo.create({
         workId: savedWork.id,
@@ -497,6 +501,9 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
         }
       }
     });
+
+    // 🔹 Filter out tasks from finished objects
+    qb.andWhere("object.status != :finishedStatus", { finishedStatus: ObjectStatus.FINISHED });
 
     qb.orderBy(`entity.${sortBy}`, sortOrder);
 
