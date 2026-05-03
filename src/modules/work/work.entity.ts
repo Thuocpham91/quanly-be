@@ -4,6 +4,11 @@ import { ObjectEntity } from "../object/object.entity";
 import { WorkTask } from "./work-task.entity";
 import { Order } from "../order/order.entity";
 
+export enum WorkStatus {
+  ACTIVE = "ACTIVE",
+  FINISHED = "FINISHED",
+}
+
 @Entity({ name: "WORK", schema: "public" })
 export class Work extends BaseAuditEntity {
   @PrimaryGeneratedColumn({ type: "bigint" })
@@ -11,6 +16,13 @@ export class Work extends BaseAuditEntity {
 
   @Column({ type: "varchar", length: 255 })
   title!: string;
+
+  @Column({
+    type: "varchar",
+    length: 20,
+    default: WorkStatus.ACTIVE,
+  })
+  status!: WorkStatus;
 
   @Column({ type: "bigint" })
   objectId!: string;

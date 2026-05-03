@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, HttpStatus, Logger, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Work } from "./work.entity";
+import { Work, WorkStatus } from "./work.entity";
 import { ObjectEntity, ObjectStatus } from "../object/object.entity";
 import { ObjectTask } from "../object/object-task.entity";
 import { WorkResponseDto, WorkListResponse, WorkResponse } from "./dto/response/work.response";
@@ -503,7 +503,10 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     });
 
     // 🔹 Filter out tasks from finished objects
-    qb.andWhere("object.status != :finishedStatus", { finishedStatus: ObjectStatus.FINISHED });
+    qb.andWhere("object.status != :finishedObjectStatus", { finishedObjectStatus: ObjectStatus.FINISHED });
+    
+    // 🔹 Filter out tasks from finished works
+    qb.andWhere("work.status != :finishedWorkStatus", { finishedWorkStatus: WorkStatus.FINISHED });
 
     qb.orderBy(`entity.${sortBy}`, sortOrder);
 

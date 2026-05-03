@@ -118,6 +118,11 @@ export class UpdateWorkDto {
   @IsInt()
   @IsOptional()
   removalCount?: number;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  status?: string;
 }
 
 export class CreateWorkTaskDto {

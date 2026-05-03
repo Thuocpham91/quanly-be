@@ -54,6 +54,10 @@ export class WorkResponseDto {
 
   @Expose()
   @ApiProperty()
+  status?: string;
+
+  @Expose()
+  @ApiProperty()
   orders?: any[];
 }
 
