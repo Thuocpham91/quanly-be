@@ -47,4 +47,8 @@ export class WorkTaskResponseDto {
   @Expose()
   @ApiPropertyOptional({ type: [String] })
   fileUrls?: string[];
+
+  @Expose()
+  @ApiPropertyOptional()
+  feedPerAnimal?: number;
 }

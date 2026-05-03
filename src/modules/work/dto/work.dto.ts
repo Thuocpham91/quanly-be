@@ -147,6 +147,11 @@ export class CreateWorkTaskDto {
   @IsDate()
   @IsNotEmpty()
   startDate!: Date;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  feedPerAnimal?: number;
 }
 
 export class UpdateWorkTaskDto {
@@ -195,6 +200,11 @@ export class UpdateWorkTaskDto {
   @IsArray()
   @IsString({ each: true })
   fileUrls?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  feedPerAnimal?: number;
 }
 export class SearchWorkTaskDto extends BaseSearchDto {
   @ApiPropertyOptional()

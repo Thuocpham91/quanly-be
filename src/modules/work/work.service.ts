@@ -194,6 +194,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
         offsetDays: Number(task.workDate),
         quantity: dto.quantity || task.quantity,
         removalCount: task.removalCount,
+        feedPerAnimal: task.feedPerAnimal,
       });
     });
 
