@@ -43,4 +43,7 @@ export class WorkTask extends BaseAuditEntity {
 
   @Column({ type: "simple-array", nullable: true })
   fileUrls?: string[];
+
+  @Column({ type: "boolean", default: false })
+  isRecurring!: boolean;
 }

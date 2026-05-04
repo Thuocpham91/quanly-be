@@ -31,4 +31,7 @@ export class ObjectTask extends BaseAuditEntity {
 
   @Column({ type: "float", nullable: true })
   feedPerAnimal?: number;
+
+  @Column({ type: "boolean", default: false })
+  isRecurring!: boolean;
 }

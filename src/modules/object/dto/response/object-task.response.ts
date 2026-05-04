@@ -33,6 +33,10 @@ export class ObjectTaskResponseDto {
   @ApiPropertyOptional()
   @Expose()
   feedPerAnimal?: number;
+
+  @ApiProperty()
+  @Expose()
+  isRecurring!: boolean;
 }
 
 export interface ObjectTaskResponse {

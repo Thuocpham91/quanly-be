@@ -36,6 +36,10 @@ export class CreateObjectTaskDto {
   @IsNumber()
   @IsOptional()
   feedPerAnimal?: number;
+
+  @ApiPropertyOptional({ description: "Is this task recurring daily?" })
+  @IsOptional()
+  isRecurring?: boolean;
 }
 
 export class UpdateObjectTaskDto {
@@ -72,4 +76,8 @@ export class UpdateObjectTaskDto {
   @IsNumber()
   @IsOptional()
   feedPerAnimal?: number;
+
+  @ApiPropertyOptional({ description: "Is this task recurring daily?" })
+  @IsOptional()
+  isRecurring?: boolean;
 }

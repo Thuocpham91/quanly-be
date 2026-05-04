@@ -51,4 +51,8 @@ export class WorkTaskResponseDto {
   @Expose()
   @ApiPropertyOptional()
   feedPerAnimal?: number;
+
+  @Expose()
+  @ApiPropertyOptional()
+  isRecurring?: boolean;
 }

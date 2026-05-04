@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, HttpStatus, Logger, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, Not } from "typeorm";
 import { Work, WorkStatus } from "./work.entity";
 import { ObjectEntity, ObjectStatus } from "../object/object.entity";
 import { ObjectTask } from "../object/object-task.entity";
@@ -426,6 +426,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     if (params.managerChecked !== undefined) filters.managerChecked = params.managerChecked;
 
     if (params.startDate) {
+      await this.ensureRecurringTasks(params.startDate);
       filters.startDate = params.startDate;
     }
 
@@ -529,5 +530,57 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
         currentPage: pageNum,
       },
     };
+  }
+
+  async ensureRecurringTasks(dateStr: string) {
+    try {
+      const targetDate = new Date(dateStr);
+      targetDate.setHours(0, 0, 0, 0);
+
+      // 1. Get active works
+      const activeWorks = await this.workRepo.find({
+        where: {
+          status: Not(WorkStatus.FINISHED)
+        }
+      });
+
+      for (const work of activeWorks) {
+        const workStart = new Date(work.startDate);
+        workStart.setHours(0, 0, 0, 0);
+
+        if (targetDate < workStart) continue;
+
+        // 2. Get recurring templates for this work's object
+        const recurringTemplates = await this.objectTaskRepo.find({
+          where: { objectId: work.objectId, isRecurring: true }
+        });
+
+        for (const template of recurringTemplates) {
+          // 3. Check if task already exists for this day
+          // Using query builder to handle date comparison accurately
+          const existing = await this.workTaskRepo.createQueryBuilder("task")
+            .where("task.workId = :workId", { workId: work.id })
+            .andWhere("task.taskName = :taskName", { taskName: template.taskName })
+            .andWhere("DATE(task.startDate) = DATE(:targetDate)", { targetDate })
+            .getOne();
+
+          if (!existing) {
+            const newTask = this.workTaskRepo.create({
+              workId: work.id,
+              taskName: template.taskName,
+              description: template.description,
+              startDate: targetDate,
+              isRecurring: true,
+              quantity: work.quantity || template.quantity,
+              feedPerAnimal: template.feedPerAnimal,
+            });
+            await this.workTaskRepo.save(newTask);
+            this.logger.log(`Auto-generated recurring task "${template.taskName}" for Work ${work.id} on ${dateStr}`);
+          }
+        }
+      }
+    } catch (error) {
+      this.logger.error(`Error ensuring recurring tasks for ${dateStr}:`, error);
+    }
   }
 }
