@@ -5,7 +5,7 @@ import { Role } from "../modules/role/role.entity";
 import { ChickenPrice } from "../modules/chicken-price/chicken-price.entity";
 import { ObjectEntity, ObjectType, ObjectStatus } from "../modules/object/object.entity";
 import { ObjectTask } from "../modules/object/object-task.entity";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 @Injectable()
 export class DatabaseSeederService implements OnModuleInit {
@@ -25,8 +25,8 @@ export class DatabaseSeederService implements OnModuleInit {
 
   async onModuleInit() {
     await this.seedRoles();
-    // await this.seedObjects();
-    // await this.seedObjectTasks();
+    await this.seedObjects();
+    await this.seedObjectTasks();
   }
 
   private async seedRoles(): Promise<void> {
@@ -77,9 +77,9 @@ export class DatabaseSeederService implements OnModuleInit {
 
       if (!object) {
         const objectData = {
-          name: 'Gà con - Chăm sóc từ ngày 1',
+          name: "Gà con - Chăm sóc từ ngày 1",
           startDate: new Date(),
-          description: 'Nhóm gà con trong quy trình chăm sóc từ ngày 1',
+          description: "Nhóm gà con trong quy trình chăm sóc từ ngày 1",
           type: ObjectType.VAO_GA,
           quantity: 100,
           status: ObjectStatus.ACTIVE,
@@ -106,17 +106,18 @@ export class DatabaseSeederService implements OnModuleInit {
         return;
       }
 
-      const workbook = XLSX.readFile('lich_ga_FULL_CHUAN_TRAI.xlsx');
+      const workbook = XLSX.readFile("lich_ga_FULL_CHUAN_TRAI.xlsx");
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
 
       for (const row of data) {
         // Map Excel columns to ObjectTask fields
-        const ngay = row['Ngày'];
-        const camGCon = row['Cám (g/con)'];
-        const trLuong = row['Trọng lượng (g)'];
-        
+        const ngay = row["Ngày"];
+        const camGCon = row["Cám (g/con)"];
+        const trLuong = row["Trọng lượng (g)"];
+        const hasEggCount = row["có trứng"];
+
         // Skip rows without required data
         if (!ngay) {
           this.logger.warn(`Skipping invalid row: ${JSON.stringify(row)}`);
@@ -129,6 +130,7 @@ export class DatabaseSeederService implements OnModuleInit {
           quantity: trLuong ? Math.floor(trLuong) : null,
           workDate: ngay,
           removalCount: null,
+          hasEggCount: hasEggCount ? true : false,
           description: this.buildDescription(row),
           feedPerAnimal: camGCon ? parseFloat(camGCon) : null,
         };
@@ -154,19 +156,19 @@ export class DatabaseSeederService implements OnModuleInit {
 
   private buildDescription(row: any): string {
     const parts = [];
-    
-    if (row['Cám (g/con)']) parts.push(`<p>Cám: ${row['Cám (g/con)']}g/con</p>`);
-    if (row['Trọng lượng (g)']) parts.push(`<p>Trọng lượng: ${row['Trọng lượng (g)']}g</p>`);
-    if (row['Uống sáng']) parts.push(`<p>Uống sáng: ${row['Uống sáng']}</p>`);
-    if (row['Uống chiều']) parts.push(`<p>Uống chiều: ${row['Uống chiều']}</p>`);
-    if (row['Liều dùng']) parts.push(`<p>Liều dùng: ${row['Liều dùng']}</p>`);
-    if (row['Canxi']) parts.push(`<p>Canxi: ${row['Canxi']}</p>`);
-    if (row['D3']) parts.push(`<p>D3: ${row['D3']}</p>`);
-    if (row['Vaccine']) parts.push(`<p>Vaccine: ${row['Vaccine']}</p>`);
-    if (row['Phòng E.coli']) parts.push(`<p>Phòng E.coli: ${row['Phòng E.coli']}</p>`);
-    if (row['Phòng cầu trùng']) parts.push(`<p>Phòng cầu trùng: ${row['Phòng cầu trùng']}</p>`);
-    if (row['Phòng tụ huyết trùng']) parts.push(`<p>Phòng tụ huyết trùng: ${row['Phòng tụ huyết trùng']}</p>`);
 
-    return parts.length > 0 ? parts.join('') : '<p>loại trứng ko phôi</p>';
+    if (row["Cám (g/con)"]) parts.push(`<p>Cám: ${row["Cám (g/con)"]}g/con</p>`);
+    if (row["Trọng lượng (g)"]) parts.push(`<p>Trọng lượng: ${row["Trọng lượng (g)"]}g</p>`);
+    if (row["Uống sáng"]) parts.push(`<p>Uống sáng: ${row["Uống sáng"]}</p>`);
+    if (row["Uống chiều"]) parts.push(`<p>Uống chiều: ${row["Uống chiều"]}</p>`);
+    if (row["Liều dùng"]) parts.push(`<p>Liều dùng: ${row["Liều dùng"]}</p>`);
+    if (row["Canxi"]) parts.push(`<p>Canxi: ${row["Canxi"]}</p>`);
+    if (row["D3"]) parts.push(`<p>D3: ${row["D3"]}</p>`);
+    if (row["Vaccine"]) parts.push(`<p>Vaccine: ${row["Vaccine"]}</p>`);
+    if (row["Phòng E.coli"]) parts.push(`<p>Phòng E.coli: ${row["Phòng E.coli"]}</p>`);
+    if (row["Phòng cầu trùng"]) parts.push(`<p>Phòng cầu trùng: ${row["Phòng cầu trùng"]}</p>`);
+    if (row["Phòng tụ huyết trùng"]) parts.push(`<p>Phòng tụ huyết trùng: ${row["Phòng tụ huyết trùng"]}</p>`);
+
+    return parts.length > 0 ? parts.join("") : "<p>loại trứng ko phôi</p>";
   }
 }
