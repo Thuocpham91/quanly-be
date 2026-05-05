@@ -40,6 +40,10 @@ export class CreateObjectTaskDto {
   @ApiPropertyOptional({ description: "Is this task recurring daily?" })
   @IsOptional()
   isRecurring?: boolean;
+
+  @ApiPropertyOptional({ description: "Does this task collect egg count?" })
+  @IsOptional()
+  hasEggCount?: boolean;
 }
 
 export class UpdateObjectTaskDto {
@@ -80,4 +84,8 @@ export class UpdateObjectTaskDto {
   @ApiPropertyOptional({ description: "Is this task recurring daily?" })
   @IsOptional()
   isRecurring?: boolean;
+
+  @ApiPropertyOptional({ description: "Does this task collect egg count?" })
+  @IsOptional()
+  hasEggCount?: boolean;
 }

@@ -46,4 +46,10 @@ export class WorkTask extends BaseAuditEntity {
 
   @Column({ type: "boolean", default: false })
   isRecurring!: boolean;
+
+  @Column({ type: "boolean", default: false })
+  hasEggCount!: boolean;
+
+  @Column({ type: "int", nullable: true })
+  eggCount?: number;
 }

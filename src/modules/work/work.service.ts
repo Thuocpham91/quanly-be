@@ -195,6 +195,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
         quantity: dto.quantity || task.quantity,
         removalCount: task.removalCount,
         feedPerAnimal: task.feedPerAnimal,
+        hasEggCount: task.hasEggCount,
       });
     });
 
@@ -571,6 +572,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
               description: template.description,
               startDate: targetDate,
               isRecurring: true,
+              hasEggCount: template.hasEggCount,
               quantity: work.quantity || template.quantity,
               feedPerAnimal: template.feedPerAnimal,
             });

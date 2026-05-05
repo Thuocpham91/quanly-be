@@ -55,4 +55,12 @@ export class WorkTaskResponseDto {
   @Expose()
   @ApiPropertyOptional()
   isRecurring?: boolean;
+
+  @Expose()
+  @ApiProperty()
+  hasEggCount!: boolean;
+
+  @Expose()
+  @ApiPropertyOptional()
+  eggCount?: number;
 }

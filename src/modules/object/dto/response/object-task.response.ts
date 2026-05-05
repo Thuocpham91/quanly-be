@@ -37,6 +37,10 @@ export class ObjectTaskResponseDto {
   @ApiProperty()
   @Expose()
   isRecurring!: boolean;
+
+  @ApiProperty()
+  @Expose()
+  hasEggCount!: boolean;
 }
 
 export interface ObjectTaskResponse {

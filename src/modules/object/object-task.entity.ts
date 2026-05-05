@@ -34,4 +34,7 @@ export class ObjectTask extends BaseAuditEntity {
 
   @Column({ type: "boolean", default: false })
   isRecurring!: boolean;
+
+  @Column({ type: "boolean", default: false })
+  hasEggCount!: boolean;
 }

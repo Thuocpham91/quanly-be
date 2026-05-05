@@ -152,6 +152,17 @@ export class CreateWorkTaskDto {
   @IsOptional()
   @Type(() => Number)
   feedPerAnimal?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  hasEggCount?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  eggCount?: number;
 }
 
 export class UpdateWorkTaskDto {
@@ -205,6 +216,17 @@ export class UpdateWorkTaskDto {
   @IsOptional()
   @Type(() => Number)
   feedPerAnimal?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  hasEggCount?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  eggCount?: number;
 }
 export class SearchWorkTaskDto extends BaseSearchDto {
   @ApiPropertyOptional()
