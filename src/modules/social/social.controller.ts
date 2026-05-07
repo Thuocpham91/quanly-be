@@ -16,50 +16,50 @@ export class SocialController {
   // Groups
   @Get("groups")
   @ApiOperation({ summary: "Get all FB groups for current user" })
-  async getGroups(@CurrentUser() user: UserEntity) {
+  async getGroups(@CurrentUser() user: User) {
     return await this.socialService.findAllGroups(user.id);
   }
 
   @Post("groups")
   @ApiOperation({ summary: "Create new FB group" })
-  async createGroup(@CurrentUser() user: UserEntity, @Body() dto: CreateFbGroupDto) {
+  async createGroup(@CurrentUser() user: User, @Body() dto: CreateFbGroupDto) {
     return await this.socialService.createGroup(user.id, dto);
   }
 
   @Put("groups/:id")
   @ApiOperation({ summary: "Update FB group" })
-  async updateGroup(@CurrentUser() user: UserEntity, @Param("id") id: string, @Body() dto: UpdateFbGroupDto) {
+  async updateGroup(@CurrentUser() user: User, @Param("id") id: string, @Body() dto: UpdateFbGroupDto) {
     return await this.socialService.updateGroup(id, user.id, dto);
   }
 
   @Delete("groups/:id")
   @ApiOperation({ summary: "Delete FB group" })
-  async deleteGroup(@CurrentUser() user: UserEntity, @Param("id") id: string) {
+  async deleteGroup(@CurrentUser() user: User, @Param("id") id: string) {
     return await this.socialService.deleteGroup(id, user.id);
   }
 
   // Templates
   @Get("templates")
   @ApiOperation({ summary: "Get all FB post templates for current user" })
-  async getTemplates(@CurrentUser() user: UserEntity) {
+  async getTemplates(@CurrentUser() user: User) {
     return await this.socialService.findAllTemplates(user.id);
   }
 
   @Post("templates")
   @ApiOperation({ summary: "Create new FB post template" })
-  async createTemplate(@CurrentUser() user: UserEntity, @Body() dto: CreateFbPostTemplateDto) {
+  async createTemplate(@CurrentUser() user: User, @Body() dto: CreateFbPostTemplateDto) {
     return await this.socialService.createTemplate(user.id, dto);
   }
 
   @Put("templates/:id")
   @ApiOperation({ summary: "Update FB post template" })
-  async updateTemplate(@CurrentUser() user: UserEntity, @Param("id") id: string, @Body() dto: UpdateFbPostTemplateDto) {
+  async updateTemplate(@CurrentUser() user: User, @Param("id") id: string, @Body() dto: UpdateFbPostTemplateDto) {
     return await this.socialService.updateTemplate(id, user.id, dto);
   }
 
   @Delete("templates/:id")
   @ApiOperation({ summary: "Delete FB post template" })
-  async deleteTemplate(@CurrentUser() user: UserEntity, @Param("id") id: string) {
+  async deleteTemplate(@CurrentUser() user: User, @Param("id") id: string) {
     return await this.socialService.deleteTemplate(id, user.id);
   }
 }
