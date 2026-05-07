@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { BaseAuditEntity } from "@common/entity/base-audit.entity";
-import { User } from "@modules/user/user.entity";
+import { User } from "../../user/user.entity";
 
 @Entity({ name: "FB_POST_TEMPLATE", schema: "public" })
 export class FbPostTemplateEntity extends BaseAuditEntity {

@@ -25,11 +25,12 @@ export class SocialService {
   }
 
   async createGroup(userId: string, dto: CreateFbGroupDto) {
+    const { type, ...rest } = dto;
     const group = this.fbGroupRepository.create({ 
-      ...dto, 
+      ...rest, 
       userId,
-      type: dto.type as FbGroupType 
-    });
+      type: type as FbGroupType 
+    } as any);
     return this.fbGroupRepository.save(group);
   }
 
@@ -37,12 +38,12 @@ export class SocialService {
     const group = await this.fbGroupRepository.findOne({ where: { id, userId } });
     if (!group) throw new NotFoundException("Group not found");
     
-    if (dto.type) {
-      group.type = dto.type as FbGroupType;
-      delete dto.type;
+    const { type, ...rest } = dto;
+    if (type) {
+      group.type = type as FbGroupType;
     }
     
-    Object.assign(group, dto);
+    Object.assign(group, rest);
     return this.fbGroupRepository.save(group);
   }
 

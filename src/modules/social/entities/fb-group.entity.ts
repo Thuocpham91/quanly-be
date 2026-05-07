@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { BaseAuditEntity } from "@common/entity/base-audit.entity";
-import { User } from "@modules/user/user.entity";
+import { User } from "../../user/user.entity";
 
 import { FbGroupType } from "@common/constans/enum.constant";
 
