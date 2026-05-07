@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { FbGroupEntity } from "./entities/fb-group.entity";
 import { FbPostTemplateEntity } from "./entities/fb-post-template.entity";
+import { FbGroupType } from "@common/constans/enum.constant";
 import { CreateFbGroupDto, UpdateFbGroupDto } from "./dto/fb-group.dto";
 import { CreateFbPostTemplateDto, UpdateFbPostTemplateDto } from "./dto/fb-post-template.dto";
 
@@ -24,13 +25,23 @@ export class SocialService {
   }
 
   async createGroup(userId: string, dto: CreateFbGroupDto) {
-    const group = this.fbGroupRepository.create({ ...dto, userId });
+    const group = this.fbGroupRepository.create({ 
+      ...dto, 
+      userId,
+      type: dto.type as FbGroupType 
+    });
     return this.fbGroupRepository.save(group);
   }
 
   async updateGroup(id: string, userId: string, dto: UpdateFbGroupDto) {
     const group = await this.fbGroupRepository.findOne({ where: { id, userId } });
     if (!group) throw new NotFoundException("Group not found");
+    
+    if (dto.type) {
+      group.type = dto.type as FbGroupType;
+      delete dto.type;
+    }
+    
     Object.assign(group, dto);
     return this.fbGroupRepository.save(group);
   }

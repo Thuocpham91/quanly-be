@@ -5,7 +5,7 @@ import { CreateFbGroupDto, UpdateFbGroupDto } from "./dto/fb-group.dto";
 import { CreateFbPostTemplateDto, UpdateFbPostTemplateDto } from "./dto/fb-post-template.dto";
 import { AuthCustom } from "@core/decorators/auth-custom.decorator";
 import { CurrentUser } from "@core/decorators/user.decorator";
-import { UserEntity } from "@modules/user/user.entity";
+import { User } from "@modules/user/user.entity";
 
 @ApiTags("Social Management")
 @Controller("social")

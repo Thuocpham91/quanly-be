@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { BaseAuditEntity } from "@common/entity/base-audit.entity";
-import { UserEntity } from "@modules/user/user.entity";
+import { User } from "@modules/user/user.entity";
 
 import { FbGroupType } from "@common/constans/enum.constant";
 
@@ -25,7 +25,7 @@ export class FbGroupEntity extends BaseAuditEntity {
   @Column({ type: "bigint" })
   userId!: string;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => User)
   @JoinColumn({ name: "userId" })
-  user?: UserEntity;
+  user?: User;
 }
