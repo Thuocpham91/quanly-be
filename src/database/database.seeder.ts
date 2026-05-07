@@ -25,8 +25,8 @@ export class DatabaseSeederService implements OnModuleInit {
 
   async onModuleInit() {
     await this.seedRoles();
-    await this.seedObjects();
-    await this.seedObjectTasks();
+    // await this.seedObjects();
+    // await this.seedObjectTasks();
   }
 
   private async seedRoles(): Promise<void> {
