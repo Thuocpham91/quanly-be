@@ -85,3 +85,11 @@ export const PermissionKEy = [
     description: "Delete  permission",
   },
 ];
+
+export enum FbGroupType {
+  BUY_SELL = "MUA_BAN",
+  TECHNICAL = "KY_THUAT",
+  COMMUNITY = "CONG_DONG",
+  LOCAL = "VUNG_MIEN",
+  OTHER = "KHAC",
+}

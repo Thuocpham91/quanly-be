@@ -18,6 +18,7 @@ import { ChickenPriceModule } from "./modules/chicken-price/chicken-price.module
 import { FileModule } from "@modules/file/file.module";
 import { ExpenseModule } from "./modules/expense/expense.module";
 import { CallHistoryModule } from "./modules/call-history/call-history.module";
+import { SocialModule } from "./modules/social/social.module";
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { CallHistoryModule } from "./modules/call-history/call-history.module";
     FileModule,
     ExpenseModule,
     CallHistoryModule,
+    SocialModule,
   ],
 })
 export class AppModule {}
