@@ -29,6 +29,9 @@ export class AuthResponseDataDto {
 
   @ApiProperty({ example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." })
   accessToken: string;
+
+  @ApiProperty({ type: [String], required: false, description: "Danh sách quyền của người dùng" })
+  permissions?: string[];
 }
 
 export class AuthResponse extends BaseResponse<AuthResponseDataDto> {
