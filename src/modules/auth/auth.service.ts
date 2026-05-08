@@ -97,6 +97,7 @@ export class AuthService {
         gender: user.gender,
         avatar: user.avatar,
         role: user.role,
+        permissions: user.permissions,
         accessToken,
       },
     };
