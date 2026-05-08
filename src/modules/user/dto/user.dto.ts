@@ -75,6 +75,12 @@ export class CreateUserDto {
   @IsOptional()
   @Transform(({ value }) => (value ? Number(value) : undefined))
   percentage?: number;
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  permissions?: string[];
 }
 
 export class UpdateUserDto {
@@ -141,6 +147,12 @@ export class UpdateUserDto {
   @IsOptional()
   @Transform(({ value }) => (value ? Number(value) : undefined))
   percentage?: number;
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  permissions?: string[];
 }
 export class UpdateRoleDto {
   @ApiProperty()

@@ -60,4 +60,7 @@ export class User extends BaseAuditEntity {
 
   @Column({ type: "enum", enum: UserStatusEnum, default: UserStatusEnum.ACTIVE })
   status: UserStatusEnum;
+
+  @Column({ type: "simple-array", nullable: true })
+  permissions?: string[];
 }
