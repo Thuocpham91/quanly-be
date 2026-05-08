@@ -350,24 +350,24 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
       .createQueryBuilder("order")
       .leftJoinAndSelect("order.user", "user")
       .leftJoinAndSelect("order.work", "work")
-      .where("DATE(order.exportDate) = :date", { date: targetDateStr })
+      .where("DATE(order.saleDate) = :date", { date: targetDateStr })
       .getMany();
 
     // 2. Find next available date
     const nextDateResult = await this.orderRepo
       .createQueryBuilder("order")
-      .select("DATE(order.exportDate)", "nextDate")
-      .where("DATE(order.exportDate) > :date", { date: targetDateStr })
-      .orderBy("order.exportDate", "ASC")
+      .select("DATE(order.saleDate)", "nextDate")
+      .where("DATE(order.saleDate) > :date", { date: targetDateStr })
+      .orderBy("order.saleDate", "ASC")
       .limit(1)
       .getRawOne();
 
     // 3. Find previous available date
     const prevDateResult = await this.orderRepo
       .createQueryBuilder("order")
-      .select("DATE(order.exportDate)", "prevDate")
-      .where("DATE(order.exportDate) < :date", { date: targetDateStr })
-      .orderBy("order.exportDate", "DESC")
+      .select("DATE(order.saleDate)", "prevDate")
+      .where("DATE(order.saleDate) < :date", { date: targetDateStr })
+      .orderBy("order.saleDate", "DESC")
       .limit(1)
       .getRawOne();
 
@@ -382,7 +382,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
         .createQueryBuilder("order")
         .leftJoinAndSelect("order.user", "user")
         .leftJoinAndSelect("order.work", "work")
-        .where("DATE(order.exportDate) = :date", { date: nextDateStr })
+        .where("DATE(order.saleDate) = :date", { date: nextDateStr })
         .getMany();
     }
 
