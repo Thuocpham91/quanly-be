@@ -40,6 +40,8 @@ export class UserController {
 
   // 🔹 Get all users
   @Get()
+  @AuthCustom()
+  @Permissions('/admin/users:view')
   @ApiOperation({ summary: "Get all users" })
   @ApiResponse({ status: 200, description: "List of users" })
   async getAll(): Promise<UserListResponse> {
@@ -64,6 +66,8 @@ export class UserController {
 
   // 🔹 Get user by ID
   @Get(":id")
+  @AuthCustom()
+  @Permissions('/admin/users:view')
   @ApiOperation({ summary: "Get user by ID" })
   async getById(@Param("id") id: number): Promise<UserResponse> {
     const user = await this.userService.getById(id);
@@ -73,6 +77,8 @@ export class UserController {
   // 🔹 Create user
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @AuthCustom()
+  @Permissions('/admin/users:add')
   @ApiOperation({ summary: "Create new user" })
   @ApiResponse({ status: 201, description: "User created successfully" })
   async create(@Body() dto: CreateUserDto): Promise<UserResponse> {
@@ -81,6 +87,8 @@ export class UserController {
 
   // 🔹 Update user
   @Put(":id")
+  @AuthCustom()
+  @Permissions('/admin/users:edit')
   @ApiOperation({ summary: "Update user" })
   @ApiResponse({ status: 200, description: "User updated successfully" })
   async update(@Param("id") id: number, @Body() dto: UpdateUserDto): Promise<UserResponse> {
@@ -89,6 +97,8 @@ export class UserController {
 
   // 🔹 Delete user
   @Delete(":id")
+  @AuthCustom()
+  @Permissions('/admin/users:delete')
   @ApiOperation({ summary: "Delete user" })
   @ApiResponse({ status: 200, description: "User deleted successfully" })
   async delete(@Param("id") id: number): Promise<UserResponse> {

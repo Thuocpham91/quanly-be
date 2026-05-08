@@ -20,25 +20,51 @@ export class RolesPermissionsGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    const { user } = context.switchToHttp().getRequest();
-    console.log(user);
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
 
     if (!user) {
       throw new CustomHttpException("User not authenticated", "USER_NOT_AUTH");
     }
-    let checkPermission: boolean = false;
-    // Kiểm tra role
-    if (requiredRoles && requiredRoles.some((role) => user.role?.includes(role))) {
-      checkPermission = true;
+
+    // Nếu không yêu cầu role hay permission gì thì cho qua
+    if ((!requiredRoles || requiredRoles.length === 0) && (!requiredPermissions || requiredPermissions.length === 0)) {
+      return true;
     }
 
-    // Kiểm tra permission
-    if (requiredPermissions && requiredPermissions.some((perm) => user.permissions?.includes(perm))) {
-      checkPermission = true;
-    }
-    if (checkPermission == false)
-      throw new CustomHttpException("You do not have the required permission", "NOT_PERMISSION");
+    const roleCode = user.role?.code?.toUpperCase();
+    const isAdmin = roleCode === 'ADMIN' || roleCode === 'SUPERADMIN';
 
-    return true;
+    // Admin có toàn quyền
+    if (isAdmin) {
+      return true;
+    }
+
+    let hasRole = false;
+    if (requiredRoles && requiredRoles.length > 0) {
+      hasRole = requiredRoles.includes(roleCode);
+    }
+
+    let hasPermission = false;
+    if (requiredPermissions && requiredPermissions.length > 0) {
+      hasPermission = requiredPermissions.some((perm) => user.permissions?.includes(perm));
+    }
+
+    // Nếu endpoint chỉ yêu cầu role, check role
+    if (requiredRoles && requiredRoles.length > 0 && (!requiredPermissions || requiredPermissions.length === 0)) {
+      if (hasRole) return true;
+    }
+    
+    // Nếu endpoint chỉ yêu cầu permission, check permission
+    if (requiredPermissions && requiredPermissions.length > 0 && (!requiredRoles || requiredRoles.length === 0)) {
+      if (hasPermission) return true;
+    }
+
+    // Nếu yêu cầu cả hai, thì user cần thỏa mãn MỘT TRONG HAI (Role hoặc Permission)
+    if (requiredRoles && requiredRoles.length > 0 && requiredPermissions && requiredPermissions.length > 0) {
+      if (hasRole || hasPermission) return true;
+    }
+
+    throw new CustomHttpException("You do not have the required permission", "NOT_PERMISSION");
   }
 }
