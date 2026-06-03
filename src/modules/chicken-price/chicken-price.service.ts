@@ -20,9 +20,9 @@ export class ChickenPriceService {
     const today = new Date().toISOString().split("T")[0];
     const price = await this.repo.findOne({ where: { priceDate: today as any } });
     if (!price) {
-      // Lấy bản ghi mới nhất nếu hôm nay chưa có
-      const latest = await this.repo.findOne({ order: { priceDate: "DESC" } });
-      return { statusCode: HttpStatus.OK, data: latest || null, isLatest: !latest };
+      const latests = await this.repo.find({ order: { priceDate: "DESC" }, take: 1 });
+      const latest = latests[0] || null;
+      return { statusCode: HttpStatus.OK, data: latest, isLatest: !latest };
     }
     return { statusCode: HttpStatus.OK, data: price };
   }

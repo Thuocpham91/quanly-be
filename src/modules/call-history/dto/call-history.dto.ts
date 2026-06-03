@@ -21,6 +21,7 @@ export class SearchCallHistoryDto {
 }
 
 export type CallFilterType =
+  | "ALL"
   | "NOT_CALLED"
   | "CALLED_10"
   | "CALLED_60"
@@ -31,9 +32,9 @@ export type CallFilterType =
 export class CallStatusFilterDto {
   @ApiPropertyOptional({
     description: "Filter customers by call status",
-    enum: ["NOT_CALLED", "CALLED_10", "CALLED_60", "NO_CALL_10", "NO_CALL_60", "NO_CALL_5M"],
+    enum: ["ALL", "NOT_CALLED", "CALLED_10", "CALLED_60", "NO_CALL_10", "NO_CALL_60", "NO_CALL_5M"],
   })
   @IsOptional()
-  @IsIn(["NOT_CALLED", "CALLED_10", "CALLED_60", "NO_CALL_10", "NO_CALL_60", "NO_CALL_5M"])
+  @IsIn(["ALL", "NOT_CALLED", "CALLED_10", "CALLED_60", "NO_CALL_10", "NO_CALL_60", "NO_CALL_5M"])
   callFilter?: CallFilterType;
 }
