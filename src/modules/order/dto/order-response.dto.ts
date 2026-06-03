@@ -102,4 +102,13 @@ export class OrderResponseDto {
   @Expose()
   @ApiProperty()
   description?: string;
+
+  @Expose()
+  @ApiProperty()
+  deliveryStaffId?: string;
+
+  @Expose()
+  @ApiProperty()
+  @Type(() => UserResponseDto)
+  deliveryStaff?: UserResponseDto;
 }

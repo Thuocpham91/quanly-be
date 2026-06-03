@@ -49,18 +49,19 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
   // 🟩 Lấy danh sách tất cả đơn hàng
   async getAll(user: User): Promise<OrderListResponse> {
     const fullUser = await this.userRepo.findOne({ where: { id: user.id }, relations: ["role"] });
-    const isAdminOrStaff = ['ADMIN', 'MANAGER', 'STAFF'].includes(fullUser?.role?.code || '');
+    const isAdminOrManager = ['ADMIN', 'MANAGER'].includes(fullUser?.role?.code || '');
 
-    const whereCondition = isAdminOrStaff 
+    const whereCondition = isAdminOrManager 
       ? {} 
       : [
           { createdById: user.id },
-          { userId: user.id }
+          { userId: user.id },
+          { deliveryStaffId: user.id }
         ];
 
     const orders = await this.orderRepo.find({ 
       where: whereCondition,
-      relations: ["user", "creator", "work"],
+      relations: ["user", "creator", "work", "deliveryStaff"],
       order: { createdAt: "DESC" }
     });
 
@@ -340,33 +341,60 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     }
   }
 
-  async getSchedule(dateStr?: string): Promise<any> {
+  async getSchedule(dateStr?: string, user?: User): Promise<any> {
     const targetDate = dateStr ? new Date(dateStr) : new Date();
     // Normalize to YYYY-MM-DD for comparison
     const targetDateStr = targetDate.toISOString().split("T")[0];
 
+    const fullUser = user ? await this.userRepo.findOne({ where: { id: user.id }, relations: ["role"] }) : null;
+    const isAdminOrManager = ['ADMIN', 'MANAGER'].includes(fullUser?.role?.code || '');
+
     // 1. Fetch current day orders
-    const currentOrders = await this.orderRepo
+    const currentQuery = this.orderRepo
       .createQueryBuilder("order")
       .leftJoinAndSelect("order.user", "user")
       .leftJoinAndSelect("order.work", "work")
-      .where("DATE(order.saleDate) = :date", { date: targetDateStr })
-      .getMany();
+      .leftJoinAndSelect("order.deliveryStaff", "deliveryStaff")
+      .where("DATE(order.saleDate) = :date", { date: targetDateStr });
+
+    if (user && !isAdminOrManager) {
+      currentQuery.andWhere(
+        "(order.deliveryStaffId = :currentUserId OR order.createdById = :currentUserId OR order.userId = :currentUserId)",
+        { currentUserId: user.id }
+      );
+    }
+    const currentOrders = await currentQuery.getMany();
 
     // 2. Find next available date
-    const nextDateResult = await this.orderRepo
+    const nextDateQuery = this.orderRepo
       .createQueryBuilder("order")
       .select("DATE(order.saleDate)", "nextDate")
-      .where("DATE(order.saleDate) > :date", { date: targetDateStr })
+      .where("DATE(order.saleDate) > :date", { date: targetDateStr });
+
+    if (user && !isAdminOrManager) {
+      nextDateQuery.andWhere(
+        "(order.deliveryStaffId = :currentUserId OR order.createdById = :currentUserId OR order.userId = :currentUserId)",
+        { currentUserId: user.id }
+      );
+    }
+    const nextDateResult = await nextDateQuery
       .orderBy("order.saleDate", "ASC")
       .limit(1)
       .getRawOne();
 
     // 3. Find previous available date
-    const prevDateResult = await this.orderRepo
+    const prevDateQuery = this.orderRepo
       .createQueryBuilder("order")
       .select("DATE(order.saleDate)", "prevDate")
-      .where("DATE(order.saleDate) < :date", { date: targetDateStr })
+      .where("DATE(order.saleDate) < :date", { date: targetDateStr });
+
+    if (user && !isAdminOrManager) {
+      prevDateQuery.andWhere(
+        "(order.deliveryStaffId = :currentUserId OR order.createdById = :currentUserId OR order.userId = :currentUserId)",
+        { currentUserId: user.id }
+      );
+    }
+    const prevDateResult = await prevDateQuery
       .orderBy("order.saleDate", "DESC")
       .limit(1)
       .getRawOne();
@@ -378,12 +406,21 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     if (nextDateResult && nextDateResult.nextDate) {
       nextDate = nextDateResult.nextDate;
       const nextDateStr = new Date(nextDate).toISOString().split("T")[0];
-      nextOrders = await this.orderRepo
+      
+      const nextOrdersQuery = this.orderRepo
         .createQueryBuilder("order")
         .leftJoinAndSelect("order.user", "user")
         .leftJoinAndSelect("order.work", "work")
-        .where("DATE(order.saleDate) = :date", { date: nextDateStr })
-        .getMany();
+        .leftJoinAndSelect("order.deliveryStaff", "deliveryStaff")
+        .where("DATE(order.saleDate) = :date", { date: nextDateStr });
+
+      if (user && !isAdminOrManager) {
+        nextOrdersQuery.andWhere(
+          "(order.deliveryStaffId = :currentUserId OR order.createdById = :currentUserId OR order.userId = :currentUserId)",
+          { currentUserId: user.id }
+        );
+      }
+      nextOrders = await nextOrdersQuery.getMany();
     }
 
     if (prevDateResult && prevDateResult.prevDate) {

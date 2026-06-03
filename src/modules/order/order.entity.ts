@@ -82,4 +82,12 @@ export class Order extends BaseAuditEntity {
 
   @Column({ type: "text", nullable: true })
   description?: string;
+
+  @Column({ type: "bigint", name: "deliveryStaffId", nullable: true })
+  deliveryStaffId?: string;
+
+  @ManyToOne(() => User, { eager: false, onDelete: "SET NULL" })
+  @JoinColumn({ name: "deliveryStaffId" })
+  deliveryStaff?: User;
 }
+

@@ -91,6 +91,11 @@ export class CustomerService {
       if (existing) throw new ConflictException(`Customer with email ${dto.email} already exists for this user`);
     }
 
+    if (dto.phone) {
+      const existing = await this.customerRepo.findOne({ where: { phone: dto.phone, userId } });
+      if (existing) throw new ConflictException(`Khách hàng với số điện thoại ${dto.phone} đã tồn tại trong danh sách.`);
+    }
+
     let linkedUserId = dto.userCustomId;
 
     if (!linkedUserId && dto.phone) {
@@ -149,6 +154,11 @@ export class CustomerService {
     if (dto.email && dto.email !== customer.email) {
       const existing = await this.customerRepo.findOne({ where: { email: dto.email, userId: user.id } });
       if (existing) throw new ConflictException(`Customer with email ${dto.email} already exists for this user`);
+    }
+
+    if (dto.phone && dto.phone !== customer.phone) {
+      const existing = await this.customerRepo.findOne({ where: { phone: dto.phone, userId: user.id } });
+      if (existing) throw new ConflictException(`Khách hàng với số điện thoại ${dto.phone} đã tồn tại trong danh sách.`);
     }
 
     Object.assign(customer, dto);

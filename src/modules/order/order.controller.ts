@@ -17,8 +17,8 @@ export class OrderController {
 
   @Get("schedule")
   @ApiOperation({ summary: "Get order schedule (today and next available date)" })
-  async getSchedule(@Query() params: SearchOrderDto) {
-    return await this.orderService.getSchedule(params.date);
+  async getSchedule(@Query() params: SearchOrderDto, @CurrentUser() user: User) {
+    return await this.orderService.getSchedule(params.date, user);
   }
 
   // 🔹 Get all orders
