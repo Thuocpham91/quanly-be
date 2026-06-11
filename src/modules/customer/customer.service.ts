@@ -35,12 +35,9 @@ export class CustomerService {
   }
 
   async search(params: SearchCustomerDto, user: User): Promise<CustomerListResponse> {
-    const isAdminOrStaff = this.isAdminOrStaff(user);
     const query = this.customerRepo.createQueryBuilder("customer");
- 
-    if (!isAdminOrStaff) {
-      query.andWhere("customer.userId = :userId", { userId: user.id });
-    }
+
+    query.andWhere("customer.userId = :userId", { userId: user.id });
  
     if (params.keyword) {
       query.andWhere("customer.name ILIKE :keyword OR customer.email ILIKE :keyword", {
@@ -72,10 +69,7 @@ export class CustomerService {
   }
  
   async getById(id: string, user: User): Promise<CustomerResponse> {
-    const isAdminOrStaff = this.isAdminOrStaff(user);
-    const where = isAdminOrStaff ? { id } : { id, userId: user.id };
-    
-    const customer = await this.customerRepo.findOne({ where });
+    const customer = await this.customerRepo.findOne({ where: { id, userId: user.id } });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
  
     return {
@@ -138,18 +132,8 @@ export class CustomerService {
   }
 
   async updateCustomer(id: string, dto: UpdateCustomerDto, user: User): Promise<CustomerResponse> {
-    const isAdminOrManager = this.isAdminOrManager(user);
-    const isAdminOrStaff = this.isAdminOrStaff(user);
-    
-    const where = isAdminOrStaff ? { id } : { id, userId: user.id };
-    const customer = await this.customerRepo.findOne({ where });
+    const customer = await this.customerRepo.findOne({ where: { id, userId: user.id } });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
-
-    const isAllowedEditor = customer.editorIds && customer.editorIds.includes(user.id);
-
-    if (!isAdminOrManager && customer.userId !== user.id && !isAllowedEditor) {
-      throw new Error("Bạn không có quyền chỉnh sửa khách hàng này.");
-    }
 
     if (dto.email && dto.email !== customer.email) {
       const existing = await this.customerRepo.findOne({ where: { email: dto.email, userId: user.id } });
@@ -173,18 +157,8 @@ export class CustomerService {
   }
 
   async deleteCustomer(id: string, user: User): Promise<CustomerResponse> {
-    const isAdminOrManager = this.isAdminOrManager(user);
-    const isAdminOrStaff = this.isAdminOrStaff(user);
-    
-    const where = isAdminOrStaff ? { id } : { id, userId: user.id };
-    const customer = await this.customerRepo.findOne({ where });
+    const customer = await this.customerRepo.findOne({ where: { id, userId: user.id } });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
-
-    const isAllowedEditor = customer.editorIds && customer.editorIds.includes(user.id);
-
-    if (!isAdminOrManager && customer.userId !== user.id && !isAllowedEditor) {
-      throw new Error("Bạn không có quyền xóa khách hàng này.");
-    }
 
     await this.customerRepo.softRemove(customer);
     this.logger.log(`Customer deleted: ${id} for user: ${user.id}`);
@@ -197,13 +171,8 @@ export class CustomerService {
   }
 
   async shareCustomer(id: string, editorIds: string[], user: User): Promise<CustomerResponse> {
-    const customer = await this.customerRepo.findOne({ where: { id } });
+    const customer = await this.customerRepo.findOne({ where: { id, userId: user.id } });
     if (!customer) throw new NotFoundException(`Customer with ID ${id} not found`);
-
-    const isAdminOrManager = this.isAdminOrManager(user);
-    if (!isAdminOrManager && customer.userId !== user.id) {
-      throw new Error("Chỉ người tạo hoặc quản lý mới có quyền cấp quyền chỉnh sửa.");
-    }
 
     customer.editorIds = editorIds;
     const updated = await this.customerRepo.save(customer);
