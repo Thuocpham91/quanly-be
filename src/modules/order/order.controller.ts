@@ -53,8 +53,8 @@ export class OrderController {
   @Permissions('/admin/orders:edit')
   @ApiOperation({ summary: "Update order" })
   @ApiResponse({ status: 200, description: "Order updated successfully" })
-  async update(@Param("id") id: number, @Body() dto: UpdateOrderDto): Promise<OrderResponse> {
-    return await this.orderService.updateOrder(id, dto);
+  async update(@Param("id") id: number, @Body() dto: UpdateOrderDto, @CurrentUser() user: User): Promise<OrderResponse> {
+    return await this.orderService.updateOrder(id, dto, user);
   }
 
   // 🔹 Delete order

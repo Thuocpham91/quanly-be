@@ -92,6 +92,11 @@ export class CreateOrderDto {
   @IsString()
   @IsOptional()
   deliveryStaffId?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  createdById?: string;
 }
 
 export class UpdateOrderDto {
@@ -178,6 +183,11 @@ export class UpdateOrderDto {
   @IsString()
   @IsOptional()
   deliveryStaffId?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  createdById?: string;
 }
 
 export class SearchOrderDto extends BaseSearchDto {

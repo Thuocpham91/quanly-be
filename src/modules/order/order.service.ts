@@ -86,8 +86,14 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
     await this.ensureSelfCustomerExists(dto.userId);
 
     let actualCreatorId = createdById;
-    
-    if (createdById === dto.userId) {
+
+    // Check if requester is ADMIN or MANAGER
+    const requester = await this.userRepo.findOne({ where: { id: createdById }, relations: ["role"] });
+    const isAdminOrManager = ["ADMIN", "MANAGER"].includes(requester?.role?.code || "");
+
+    if (isAdminOrManager && dto.createdById) {
+      actualCreatorId = dto.createdById;
+    } else if (createdById === dto.userId) {
       const recentCollabOrder = await this.orderRepo.createQueryBuilder("order")
         .where("order.userId = :userId", { userId: dto.userId })
         .andWhere("order.createdById != :userId", { userId: dto.userId })
@@ -120,7 +126,7 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
       if (user) {
         await this.customerRepo.save({
           name: user.fullName || user.username,
-          userId: createdById,
+          userId: actualCreatorId,
           userCustomId: dto.userId,
           isSelfCustomer: true,
           isActive: true,
@@ -151,14 +157,28 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
   }
 
   // 🟧 Cập nhật
-  async updateOrder(id: number, dto: UpdateOrderDto): Promise<OrderResponse> {
+  async updateOrder(id: number, dto: UpdateOrderDto, user?: User): Promise<OrderResponse> {
     const order = await this.orderRepo.findOne({ where: { id: id + "" } });
     if (!order) throw new NotFoundException(`Order with ID ${id} not found`);
 
     const oldWorkId = order.workId;
     const oldUserId = order.userId;
     const oldStatus = order.status;
+    const oldCreatedById = order.createdById;
+
     Object.assign(order, dto);
+
+    // If createdById is modified, verify roles
+    if (dto.createdById && dto.createdById !== oldCreatedById) {
+      let isAdminOrManager = false;
+      if (user) {
+        const fullUser = await this.userRepo.findOne({ where: { id: user.id }, relations: ["role"] });
+        isAdminOrManager = ["ADMIN", "MANAGER"].includes(fullUser?.role?.code || "");
+      }
+      if (!isAdminOrManager) {
+        order.createdById = oldCreatedById; // Revert to old value if unauthorized
+      }
+    }
 
     if (dto.workId && dto.workId !== oldWorkId) {
       const linkedWork = await this.workRepo.findOne({ where: { id: dto.workId + "" } });
