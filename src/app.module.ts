@@ -19,6 +19,7 @@ import { FileModule } from "@modules/file/file.module";
 import { ExpenseModule } from "./modules/expense/expense.module";
 import { CallHistoryModule } from "./modules/call-history/call-history.module";
 import { SocialModule } from "./modules/social/social.module";
+import { QrConfigModule } from "./modules/qr-config/qr-config.module";
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SocialModule } from "./modules/social/social.module";
     ExpenseModule,
     CallHistoryModule,
     SocialModule,
+    QrConfigModule,
   ],
 })
 export class AppModule {}
