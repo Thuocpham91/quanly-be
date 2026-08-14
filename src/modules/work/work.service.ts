@@ -108,32 +108,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     }
 
     // 2. Determine the base reference date
-    let baseDate: Date;
-    const rawDate = dto.startDate;
-
-    if (rawDate) {
-      const d = new Date(rawDate);
-      if (!isNaN(d.getTime())) {
-        baseDate = d;
-      } else {
-        const dateStr = String(rawDate);
-        if (dateStr.includes("/")) {
-          const [day, m, y] = dateStr.split("/").map(Number);
-          baseDate = new Date(y, m - 1, day);
-        } else {
-          baseDate = new Date(dateStr);
-        }
-      }
-    } else {
-      baseDate = object.startDate ? new Date(object.startDate) : new Date();
-    }
-
-    // Normalize to start of day local time
-    baseDate.setHours(0, 0, 0, 0);
-
-    if (isNaN(baseDate.getTime())) {
-      throw new BadRequestException("Invalid startDate format. Please use YYYY-MM-DD or DD/MM/YYYY");
-    }
+    let baseDate: Date = this.parseCleanDate(dto.startDate || object.startDate);
 
     // 2.5 Parse workDate from DTO if provided
     let workDateVal: Date | undefined = undefined;
@@ -382,8 +357,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
 
     // Sync task dates if startDate or startDay of the Work batch is changed
     if (isStartDateChanged || isStartDayChanged) {
-      const newBaseDate = dto.startDate ? new Date(dto.startDate) : new Date(oldStartDate!);
-      newBaseDate.setHours(0, 0, 0, 0);
+      const newBaseDate = dto.startDate ? this.parseCleanDate(dto.startDate) : this.parseCleanDate(oldStartDate);
       work.startDate = newBaseDate;
 
       const newStartOffset = dto.startDay !== undefined ? Number(dto.startDay) : oldStartDay;
@@ -593,5 +567,28 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     } catch (error) {
       this.logger.error(`Error ensuring recurring tasks for ${dateStr}:`, error);
     }
+  }
+
+  private parseCleanDate(rawDate: any): Date {
+    if (!rawDate) {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return now;
+    }
+    if (rawDate instanceof Date && !isNaN(rawDate.getTime())) {
+      return new Date(rawDate.getFullYear(), rawDate.getMonth(), rawDate.getDate(), 0, 0, 0);
+    }
+    const dateStr = String(rawDate);
+    if (dateStr.includes("/")) {
+      const [day, m, y] = dateStr.split("/").map(Number);
+      if (y && m && day) return new Date(y, m - 1, day, 0, 0, 0);
+    }
+    if (dateStr.includes("-")) {
+      const datePart = dateStr.split("T")[0];
+      const [y, m, day] = datePart.split("-").map(Number);
+      if (y && m && day) return new Date(y, m - 1, day, 0, 0, 0);
+    }
+    const d = new Date(dateStr);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
   }
 }
