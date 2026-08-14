@@ -123,6 +123,12 @@ export class UpdateWorkDto {
   @IsString()
   @IsOptional()
   status?: string;
+
+  @ApiPropertyOptional({ description: "Start from which day in object tasks" })
+  @Type(() => Number)
+  @IsInt()
+  @IsOptional()
+  startDay?: number;
 }
 
 export class CreateWorkTaskDto {

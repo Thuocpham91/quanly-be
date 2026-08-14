@@ -155,6 +155,8 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
       }
     }
 
+    const startOffset = Number(dto.startDay || 0);
+
     // 3. Create the Parent Work entity
     const work = this.workRepo.create({
       title: dto.title,
@@ -162,6 +164,7 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
       objectId: object.id,
       object: object,
       startDate: baseDate,
+      startDay: startOffset,
       workDate: workDateVal,
       exportDate: workDateVal
         ? (() => {
@@ -177,7 +180,6 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     const savedWork = await this.workRepo.save(work);
 
     // 4. Create child WorkTask entities for each predefined Task (Filtered by startDay)
-    const startOffset = Number(dto.startDay || 0);
     const filteredTasks = tasks.filter((t) => Number(t.workDate) >= startOffset);
 
     const workTasks = filteredTasks.map((task) => {
@@ -363,7 +365,11 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
     if (!work) throw new NotFoundException(`Work with ID ${id} not found`);
 
     const oldStartDate = work.startDate;
+    const oldStartDay = work.startDay ?? 0;
     Object.assign(work, dto);
+
+    const isStartDateChanged = dto.startDate && new Date(dto.startDate).getTime() !== new Date(oldStartDate!).getTime();
+    const isStartDayChanged = dto.startDay !== undefined && Number(dto.startDay) !== oldStartDay;
 
     // Recalculate exportDate if workDate is updated
     if (dto.workDate) {
@@ -374,20 +380,23 @@ export class WorkService extends BaseService<Work, WorkResponseDto> {
       }
     }
 
-    // Sync task dates if startDate of the Work batch is changed
-    if (dto.startDate && new Date(dto.startDate).getTime() !== new Date(oldStartDate!).getTime()) {
-      const newBaseDate = new Date(dto.startDate);
+    // Sync task dates if startDate or startDay of the Work batch is changed
+    if (isStartDateChanged || isStartDayChanged) {
+      const newBaseDate = dto.startDate ? new Date(dto.startDate) : new Date(oldStartDate!);
       newBaseDate.setHours(0, 0, 0, 0);
       work.startDate = newBaseDate;
+
+      const newStartOffset = dto.startDay !== undefined ? Number(dto.startDay) : oldStartDay;
+      work.startDay = newStartOffset;
 
       const tasks = await this.workTaskRepo.find({ where: { workId: id + "" } });
       for (const t of tasks) {
         const newTaskDate = new Date(newBaseDate);
-        newTaskDate.setDate(newTaskDate.getDate() + (t.offsetDays || 0));
+        newTaskDate.setDate(newTaskDate.getDate() + ((t.offsetDays || 0) - newStartOffset));
         t.startDate = newTaskDate;
       }
       await this.workTaskRepo.save(tasks);
-      this.logger.log(`Synced ${tasks.length} task dates for Work ${id} due to startDate change`);
+      this.logger.log(`Synced ${tasks.length} task dates for Work ${id} due to startDate/startDay change (startDay: ${newStartOffset})`);
     }
 
     const updated = await this.workRepo.save(work);

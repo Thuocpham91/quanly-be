@@ -49,6 +49,9 @@ export class Work extends BaseAuditEntity {
   @Column({ type: "int", nullable: true })
   purchaseQuantity?: number;
 
+  @Column({ type: "int", nullable: true, default: 0 })
+  startDay?: number;
+
   @OneToMany(() => WorkTask, (task) => task.work, { cascade: true })
   workTasks!: WorkTask[];
 
