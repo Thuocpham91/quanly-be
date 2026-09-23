@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TerminusModule } from "@nestjs/terminus";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { MailerModule } from "@nestjs-modules/mailer";
 import { configTypeORM } from "./configs";
 import { DatabaseModule } from "./database/database.module";
 
@@ -31,6 +32,23 @@ import { QrConfigModule } from "./modules/qr-config/qr-config.module";
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [".env.local", ".env.sit", ".env"],
+    }),
+    MailerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>("MAIL_HOST") || "smtp.gmail.com",
+          port: Number(configService.get<number>("MAIL_PORT") || 587),
+          secure: false,
+          auth: {
+            user: configService.get<string>("MAIL_USER") || "phamvuthuoc91@gmail.com",
+            pass: configService.get<string>("MAIL_PASS") || "",
+          },
+        },
+        defaults: {
+          from: configService.get<string>("MAIL_FROM") || "phamvuthuoc91@gmail.com",
+        },
+      }),
     }),
 
     DatabaseModule,

@@ -2,8 +2,8 @@ FROM node:22.14.0
 
 RUN mkdir -p /app
 WORKDIR /app
-COPY package.json ./
-RUN yarn && yarn cache clean
+COPY package.json yarn.lock* ./
+RUN yarn --frozen-lockfile || yarn
 ADD ./ /app
 
 # Copy template .hbs after build — don't fail if none

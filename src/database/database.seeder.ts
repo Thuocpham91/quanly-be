@@ -1,10 +1,14 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { MailerService } from "@nestjs-modules/mailer";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Role } from "../modules/role/role.entity";
 import { ChickenPrice } from "../modules/chicken-price/chicken-price.entity";
 import { ObjectEntity, ObjectType, ObjectStatus } from "../modules/object/object.entity";
 import { ObjectTask } from "../modules/object/object-task.entity";
+import { User } from "../modules/user/user.entity";
+import * as bcrypt from "bcrypt";
 import * as XLSX from "xlsx";
 
 @Injectable()
@@ -21,10 +25,15 @@ export class DatabaseSeederService implements OnModuleInit {
     private readonly objectRepo: Repository<ObjectEntity>,
     @InjectRepository(ObjectTask)
     private readonly objectTaskRepo: Repository<ObjectTask>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    private readonly configService: ConfigService,
+    private readonly mailerService?: MailerService,
   ) {}
 
   async onModuleInit() {
     await this.seedRoles();
+    await this.ensureDefaultAdmin();
     // await this.seedObjects();
     // await this.seedObjectTasks();
   }
@@ -66,6 +75,81 @@ export class DatabaseSeederService implements OnModuleInit {
     }
 
     this.logger.log("✓ Database seeding completed");
+  }
+
+  async ensureDefaultAdmin(): Promise<void> {
+    const adminUsername = this.configService.get<string>("DEFAULT_ADMIN_USERNAME") || "admin";
+    const adminEmail = this.configService.get<string>("DEFAULT_ADMIN_EMAIL") || "phamvuthuoc91@gmail.com";
+
+    const existingAdmin = await this.userRepo.findOne({
+      where: [{ username: adminUsername }, { email: adminEmail }],
+    });
+
+    if (existingAdmin) {
+      this.logger.log(`Admin account already exists: ${existingAdmin.username} (${existingAdmin.email})`);
+      return;
+    }
+
+    const adminRole = await this.roleRepo.findOne({ where: { code: "ADMIN" } });
+    if (!adminRole) {
+      this.logger.error("ADMIN role not found. Cannot create default admin account.");
+      return;
+    }
+
+    const generatedPassword = this.generatePassword();
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+    const adminUserData: Partial<User> = {
+      username: adminUsername,
+      email: adminEmail,
+      fullName: "Administrator",
+      password: hashedPassword,
+      roleId: adminRole.id,
+      phone: "0000000000",
+      gender: "OTHER" as any,
+      status: "ACTIVE" as any,
+    };
+
+    const adminUser = this.userRepo.create(adminUserData);
+    const savedAdmin: User = await this.userRepo.save(adminUser);
+    this.logger.log(`Created default admin user: ${savedAdmin.username} (${savedAdmin.email})`);
+
+    await this.sendAdminCredentialsEmail(adminEmail, adminUsername, generatedPassword);
+  }
+
+  private generatePassword(): string {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < 12; i += 1) {
+      password += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return password;
+  }
+
+  private async sendAdminCredentialsEmail(email: string, username: string, password: string): Promise<void> {
+    const shouldSendEmail = this.configService.get<string>("AUTO_CREATE_ADMIN_SEND_EMAIL") === "true";
+
+    if (!shouldSendEmail) {
+      this.logger.warn(`Auto admin email is disabled. Generated password for ${username}: ${password}`);
+      return;
+    }
+
+    if (!this.mailerService) {
+      this.logger.warn(`Mailer not configured. Default admin password: ${password}`);
+      return;
+    }
+
+    try {
+      await this.mailerService.sendMail({
+        from: this.configService.get<string>("MAIL_FROM") || this.configService.get<string>("MAIL_USER") || "no-reply@example.com",
+        to: email,
+        subject: "Tài khoản admin hệ thống",
+        text: `Tài khoản admin đã được tạo.\nUsername: ${username}\nPassword: ${password}\nVui lòng đổi mật khẩu sau khi đăng nhập.`,
+      });
+      this.logger.log(`Admin credentials sent to ${email}`);
+    } catch (error) {
+      this.logger.error(`Failed to send admin credentials email to ${email}: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   private async seedObjects(): Promise<void> {

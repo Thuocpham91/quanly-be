@@ -4,10 +4,11 @@ import { Role } from "../modules/role/role.entity";
 import { ChickenPrice } from "../modules/chicken-price/chicken-price.entity";
 import { ObjectEntity } from "../modules/object/object.entity";
 import { ObjectTask } from "../modules/object/object-task.entity";
+import { User } from "../modules/user/user.entity";
 import { DatabaseSeederService } from "./database.seeder";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Role, ChickenPrice, ObjectEntity, ObjectTask])],
+  imports: [TypeOrmModule.forFeature([Role, ChickenPrice, ObjectEntity, ObjectTask, User])],
   providers: [DatabaseSeederService],
 })
 export class DatabaseModule {}
