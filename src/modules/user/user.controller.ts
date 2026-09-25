@@ -44,8 +44,8 @@ export class UserController {
   @Permissions('/admin/users:view')
   @ApiOperation({ summary: "Get all users" })
   @ApiResponse({ status: 200, description: "List of users" })
-  async getAll(): Promise<UserListResponse> {
-    return await this.userService.getAll();
+  async getAll(@Query("page") page?: number, @Query("limit") limit?: number): Promise<UserListResponse> {
+    return await this.userService.getAll(page, limit);
   }
 
   // � Get revenue for all users

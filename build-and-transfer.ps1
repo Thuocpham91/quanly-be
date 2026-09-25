@@ -13,8 +13,10 @@ param (
 
 $FullImage  = "$ImageName`:$Tag"
 $TarFile    = "$ImageName.tar"
-$SshOpts    = @("-o", "ServerAliveInterval=30", "-o", "ServerAliveCountMax=5",
-                "-o", "ConnectTimeout=30",       "-o", "StrictHostKeyChecking=no",
+$EnvFile    = if (Test-Path ".env.sit") { ".env.sit" } elseif (Test-Path ".env") { ".env" } else { "" }
+$SshOpts    = @("-o", "ServerAliveInterval=15", "-o", "ServerAliveCountMax=5",
+                "-o", "ConnectTimeout=20",       "-o", "StrictHostKeyChecking=no",
+                "-o", "BatchMode=yes",           "-o", "ConnectionAttempts=3",
                 "-p", "$ServerPort")
 
 Write-Host ""
@@ -23,6 +25,7 @@ Write-Host "  🚀 BUILD -> TRANSFER -> DEPLOY TO SERVER" -ForegroundColor Cyan
 Write-Host "  Server  : $ServerUser@$ServerHost`:$ServerPort" -ForegroundColor Cyan
 Write-Host "  Path    : $ServerPath" -ForegroundColor Cyan
 Write-Host "  Image   : $FullImage" -ForegroundColor Cyan
+Write-Host "  Env File: $EnvFile" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
 # ─────────────────────────────────────────────
@@ -60,6 +63,11 @@ function Upload-FileBase64 {
 }
 
 try {
+    if ([string]::IsNullOrWhiteSpace($EnvFile)) {
+        Write-Host "❌ No .env or .env.sit file found in project root." -ForegroundColor Red
+        exit 1
+    }
+
     # ─────────────────────────────────────────────
     # STEP 1: Check Docker daemon
     # ─────────────────────────────────────────────
@@ -95,7 +103,7 @@ try {
     if (-not $ok) { Write-Host "❌ Cannot connect to server" -ForegroundColor Red; exit 1 }
 
     Upload-FileBase64 "docker-compose.yml" "$ServerPath/docker-compose.yml"
-    Upload-FileBase64 ".env.sit"           "$ServerPath/.env"
+    Upload-FileBase64 $EnvFile "$ServerPath/.env"
 
     # ─────────────────────────────────────────────
     # STEP 4: Export image to .tar and Upload via SCP
@@ -109,8 +117,8 @@ try {
     Write-Host "✅ Image exported to $TarFile" -ForegroundColor Green
 
     Write-Host "`nUploading $TarFile to server via SCP (Port: $ServerPort)..." -ForegroundColor Yellow
-    scp -P $ServerPort -o ServerAliveInterval=30 -o ServerAliveCountMax=5 `
-        -o ConnectTimeout=30 -o StrictHostKeyChecking=no `
+    scp -P $ServerPort -o ServerAliveInterval=15 -o ServerAliveCountMax=5 `
+        -o ConnectTimeout=20 -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectionAttempts=3 `
         $TarFile "${ServerUser}@${ServerHost}:${ServerPath}/${TarFile}"
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Upload failed! Check your SSH/SCP connection." -ForegroundColor Red
@@ -130,15 +138,16 @@ try {
     Write-Host "✅ Image loaded on server." -ForegroundColor Green
 
     # ─────────────────────────────────────────────
-    # STEP 6: Start container via docker compose
+    # STEP 6: Start full stack via docker compose
     # ─────────────────────────────────────────────
-    Write-Host "`n[6/6] Deploying container '$ContainerName' on server..." -ForegroundColor Yellow
-    & ssh @SshOpts "$ServerUser@$ServerHost" "cd '$ServerPath' && docker compose up -d --no-build --force-recreate $ContainerName"
+    Write-Host "`n[6/6] Deploying full stack on server..." -ForegroundColor Yellow
+    & ssh @SshOpts "$ServerUser@$ServerHost" "docker network inspect gasy-network >/dev/null 2>&1 || docker network create gasy-network; cd '$ServerPath'; docker compose --env-file .env config >/dev/null; (docker compose down --remove-orphans >/dev/null 2>&1 || true); docker compose --env-file .env up -d --force-recreate"
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ Container '$ContainerName' is now running!" -ForegroundColor Green
+        Write-Host "✅ Full stack is now running!" -ForegroundColor Green
+        & ssh @SshOpts "$ServerUser@$ServerHost" "cd '$ServerPath' && docker compose --env-file .env ps"
     } else {
-        Write-Host "❌ docker compose failed! Listing server path for debug:" -ForegroundColor Red
-        & ssh @SshOpts "$ServerUser@$ServerHost" "ls -la '$ServerPath'"
+        Write-Host "❌ docker compose failed! Showing logs for debugging:" -ForegroundColor Red
+        & ssh @SshOpts "$ServerUser@$ServerHost" "cd '$ServerPath' && docker compose --env-file .env logs --tail=200"
         exit 1
     }
 

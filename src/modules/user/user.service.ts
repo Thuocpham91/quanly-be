@@ -34,12 +34,27 @@ export class UserService extends BaseService<User, UserResponseDto> {
   }
 
   // 🟩 Lấy danh sách tất cả người dùng
-  async getAll(): Promise<UserListResponse> {
-    const users = await this.userRepo.find({ relations: ["role"] });
+  async getAll(page = 1, limit = 10): Promise<any> {
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
+
+    const [users, total] = await this.userRepo.findAndCount({
+      relations: ["role"],
+      order: { createdAt: "DESC" },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
+    });
+
     return {
       statusCode: HttpStatus.OK,
       data: users.map((u) => this.toDto(u, { role: RoleResponseDto })),
       message: SuccessCode.SUCCESS,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
     };
   }
 

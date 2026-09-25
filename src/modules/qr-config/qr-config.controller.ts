@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { QrConfigService } from "./qr-config.service";
 import { CreateQrConfigDto, UpdateQrConfigDto } from "./dto/qr-config.dto";
@@ -13,8 +13,8 @@ export class QrConfigController {
 
   @Get()
   @ApiOperation({ summary: "Get all QR configurations" })
-  async getAll() {
-    return this.service.getAll();
+  async getAll(@Query("page") page?: number, @Query("limit") limit?: number) {
+    return this.service.getAll(page, limit);
   }
 
   @Get(":id")

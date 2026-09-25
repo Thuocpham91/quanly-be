@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { ChickenPriceService } from "./chicken-price.service";
 import { CreateChickenPriceDto, UpdateChickenPriceDto } from "./dto/chicken-price.dto";
@@ -20,8 +20,8 @@ export class ChickenPriceController {
   @Get()
   @AuthCustom()
   @ApiOperation({ summary: "Get all chicken prices" })
-  async getAll() {
-    return this.service.getAll();
+  async getAll(@Query("page") page?: number, @Query("limit") limit?: number) {
+    return this.service.getAll(page, limit);
   }
 
   @Post()

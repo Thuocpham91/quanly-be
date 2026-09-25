@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { SocialService } from "./social.service";
 import { CreateFbGroupDto, UpdateFbGroupDto } from "./dto/fb-group.dto";
@@ -16,8 +16,8 @@ export class SocialController {
   // Groups
   @Get("groups")
   @ApiOperation({ summary: "Get all FB groups for current user" })
-  async getGroups(@CurrentUser() user: User) {
-    return await this.socialService.findAllGroups(user.id);
+  async getGroups(@CurrentUser() user: User, @Query("page") page?: number, @Query("limit") limit?: number) {
+    return await this.socialService.findAllGroups(user.id, page, limit);
   }
 
   @Post("groups")
@@ -41,8 +41,8 @@ export class SocialController {
   // Templates
   @Get("templates")
   @ApiOperation({ summary: "Get all FB post templates for current user" })
-  async getTemplates(@CurrentUser() user: User) {
-    return await this.socialService.findAllTemplates(user.id);
+  async getTemplates(@CurrentUser() user: User, @Query("page") page?: number, @Query("limit") limit?: number) {
+    return await this.socialService.findAllTemplates(user.id, page, limit);
   }
 
   @Post("templates")

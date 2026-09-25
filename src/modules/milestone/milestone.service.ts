@@ -14,12 +14,26 @@ export class MilestoneService {
     private readonly repo: Repository<Milestone>,
   ) {}
 
-  async getAll(): Promise<any> {
-    const data = await this.repo.find({ order: { targetAmount: 'ASC' } });
+  async getAll(page = 1, limit = 10): Promise<any> {
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
+
+    const [data, total] = await this.repo.findAndCount({
+      order: { targetAmount: 'ASC' },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
+    });
+
     return {
       statusCode: HttpStatus.OK,
       data,
       message: SuccessCode.SUCCESS,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
     };
   }
 

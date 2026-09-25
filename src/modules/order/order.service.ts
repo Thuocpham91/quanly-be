@@ -47,9 +47,12 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
   }
 
   // 🟩 Lấy danh sách tất cả đơn hàng
-  async getAll(user: User): Promise<OrderListResponse> {
+  async getAll(user: User, page = 1, limit = 10): Promise<any> {
     const fullUser = await this.userRepo.findOne({ where: { id: user.id }, relations: ["role"] });
     const isAdminOrManager = ['ADMIN', 'MANAGER'].includes(fullUser?.role?.code || '');
+
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
 
     const whereCondition = isAdminOrManager 
       ? {} 
@@ -59,16 +62,24 @@ export class OrderService extends BaseService<Order, OrderResponseDto> {
           { deliveryStaffId: user.id }
         ];
 
-    const orders = await this.orderRepo.find({ 
+    const [orders, total] = await this.orderRepo.findAndCount({ 
       where: whereCondition,
       relations: ["user", "creator", "work", "deliveryStaff"],
-      order: { createdAt: "DESC" }
+      order: { createdAt: "DESC" },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
     });
 
     return {
       statusCode: HttpStatus.OK,
       data: orders.map((o) => this.toDto(o)),
       message: SuccessCode.SUCCESS,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
     };
   }
 

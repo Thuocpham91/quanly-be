@@ -3,7 +3,7 @@ volumes:
 
 services:
   quanly-chicken-be-service-db:
-    image: postgres:16
+    image: postgres:15
     platform: linux/x86_64
     container_name: quanly-chicken-be-service-db
     ports:
@@ -36,7 +36,8 @@ services:
     image: quanly-chicken-be-service:latest
     container_name: quanly-chicken-be-service
     depends_on:
-      - quanly-chicken-be-service-db
+      quanly-chicken-be-service-db:
+        condition: service_healthy
     ports:
       - "${PORT}:${PORT}"
     restart: always

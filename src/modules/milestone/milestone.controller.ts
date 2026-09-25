@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { MilestoneService } from "./milestone.service";
 import { CreateMilestoneDto, UpdateMilestoneDto } from "./dto/milestone.dto";
@@ -12,8 +12,8 @@ export class MilestoneController {
 
   @Get()
   @ApiOperation({ summary: "Get all milestones" })
-  async getAll() {
-    return await this.service.getAll();
+  async getAll(@Query("page") page?: number, @Query("limit") limit?: number) {
+    return await this.service.getAll(page, limit);
   }
 
   @Get(":id")

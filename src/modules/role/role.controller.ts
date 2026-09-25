@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { RoleService, RoleDetailResponse, RoleListResponse } from "./role.service";
 import { CreateRoleDto, UpdateRoleDto } from "./dto/role.dto";
@@ -15,8 +15,8 @@ export class RoleController {
   @Get()
   @ApiOperation({ summary: "Lấy danh sách tất cả role" })
   @ApiResponse({ status: 200, description: "Danh sách role", type: RoleListResponse })
-  async getAll(): Promise<RoleListResponse> {
-    return this.roleService.getAll();
+  async getAll(@Query("page") page?: number, @Query("limit") limit?: number): Promise<RoleListResponse> {
+    return this.roleService.getAll(page, limit);
   }
 
   // 🔹 Lấy chi tiết role

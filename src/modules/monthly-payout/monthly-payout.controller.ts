@@ -12,8 +12,8 @@ export class MonthlyPayoutController {
 
   @Get()
   @ApiOperation({ summary: "Get all payouts" })
-  async getAll() {
-    return await this.service.getAll();
+  async getAll(@Query("page") page?: number, @Query("limit") limit?: number) {
+    return await this.service.getAll(page, limit);
   }
 
   @Get("status")

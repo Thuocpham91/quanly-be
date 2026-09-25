@@ -44,12 +44,26 @@ export class RoleService implements OnModuleInit {
   }
 
   // 🟩 Lấy tất cả role
-  async getAll(): Promise<RoleListResponse> {
-    const roles = await this.roleRepo.find({ order: { createdAt: "DESC" } });
+  async getAll(page = 1, limit = 10): Promise<any> {
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
+
+    const [roles, total] = await this.roleRepo.findAndCount({
+      order: { createdAt: "DESC" },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
+    });
+
     return {
       statusCode: HttpStatus.OK,
       message: SuccessCode.SUCCESS,
       data: roles.map((r) => this.toDto(r)),
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
     };
   }
 

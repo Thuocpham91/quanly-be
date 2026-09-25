@@ -17,11 +17,26 @@ export class SocialService {
   ) {}
 
   // Groups
-  async findAllGroups(userId: string) {
-    return this.fbGroupRepository.find({
+  async findAllGroups(userId: string, page = 1, limit = 10) {
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
+
+    const [items, total] = await this.fbGroupRepository.findAndCount({
       where: { userId },
       order: { createdAt: "DESC" },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
     });
+
+    return {
+      data: items,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    };
   }
 
   async createGroup(userId: string, dto: CreateFbGroupDto) {
@@ -54,11 +69,26 @@ export class SocialService {
   }
 
   // Templates
-  async findAllTemplates(userId: string) {
-    return this.fbPostTemplateRepository.find({
+  async findAllTemplates(userId: string, page = 1, limit = 10) {
+    const pageNum = Number(page) > 0 ? Number(page) : 1;
+    const limitNum = Number(limit) > 0 ? Number(limit) : 10;
+
+    const [items, total] = await this.fbPostTemplateRepository.findAndCount({
       where: { userId },
       order: { createdAt: "DESC" },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
     });
+
+    return {
+      data: items,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    };
   }
 
   async createTemplate(userId: string, dto: CreateFbPostTemplateDto) {

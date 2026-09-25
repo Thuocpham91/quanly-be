@@ -26,8 +26,8 @@ export class OrderController {
   @Permissions('/admin/orders:view')
   @ApiOperation({ summary: "Get all orders" })
   @ApiResponse({ status: 200, description: "List of orders" })
-  async getAll(@CurrentUser() user: User): Promise<OrderListResponse> {
-    return await this.orderService.getAll(user);
+  async getAll(@CurrentUser() user: User, @Query("page") page?: number, @Query("limit") limit?: number): Promise<OrderListResponse> {
+    return await this.orderService.getAll(user, page, limit);
   }
 
   // 🔹 Get order by ID
