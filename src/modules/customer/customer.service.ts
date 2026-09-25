@@ -37,6 +37,10 @@ export class CustomerService {
   async search(params: SearchCustomerDto, user: User): Promise<CustomerListResponse> {
     const query = this.customerRepo.createQueryBuilder("customer");
 
+    if (params.includeDeleted) {
+      query.withDeleted();
+    }
+
     query.andWhere("customer.userId = :userId", { userId: user.id });
  
     if (params.keyword) {

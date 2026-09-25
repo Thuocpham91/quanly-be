@@ -105,4 +105,10 @@ export class SearchCustomerDto extends BaseSearchDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional({ description: "Bao gồm cả khách hàng đã bị xóa mềm", example: false })
+  @Type(() => Boolean)
+  @IsBoolean()
+  @IsOptional()
+  includeDeleted?: boolean;
 }
